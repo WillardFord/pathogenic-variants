@@ -1,0 +1,53 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.15.5"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "ce4194fff5fe8b0eebb7a09769bc0473",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "4186406a1ea7ffa49e96a7200ef8e94c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "64d8c6108a2eda84a1bcf47c04b58398",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='vblA-0' random-id='b4dcb40e-8119-a3f3-d05c-362333b610c4'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;All hemi, het, homozygous P and LP&#92;&quot;},{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;p.C282Y homozygotes only&#92;&quot;},{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;P and LP (2 variants)&#92;&quot;},{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;P and LP (truncating variants only)&#92;&quot;},{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;All hemi or homozygous P and LP or 2 het. P/LP variants&#92;&quot;},{&#92;&quot;Variants to report&#92;&quot;:&#92;&quot;All P and LP&#92;&quot;}]&quot;' data-total-rows='6' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;Variants to report&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PHmJ",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}
