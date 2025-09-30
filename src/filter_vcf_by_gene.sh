@@ -1,11 +1,4 @@
 #!/bin/bash
-
-# This script filters ClinVar VCF files by gene using the pathogenic genes list.
-
-# It works, but it takes 30 seconds per file * 20,000 files ~ 7 straight days.
-# Need to ask for some guidance lol
-
-
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -18,8 +11,9 @@ CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/cl
 CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
+GENE_BED="${DATA_DIR}/pathogenic_genes_10000bp.bed"
 
-for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}"; do
+for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
   if [[ ! -f "${path}" ]]; then
     echo "Missing required file: ${path}" >&2
     exit 1
@@ -39,6 +33,8 @@ FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
 
 echo "Using filter expression: ${FILTER_EXPR}"
 
+echo "Using region BED: ${GENE_BED}"
+
 vcf_files=$(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz)
 
 for vcf_file in ${vcf_files}; do
@@ -53,13 +49,14 @@ for vcf_file in ${vcf_files}; do
   gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
   gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
 
-  bcftools annotate \
-    -a "${CLINVAR_ANNOTATION}" \
-    -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-    -Ou "${local_vcf}" \
+  bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
+  | bcftools annotate \
+      -a "${CLINVAR_ANNOTATION}" \
+      -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+      -Ou - \
   | bcftools view \
-    -i "${FILTER_EXPR}" \
-    -Oz -o "${output_file}"
+      -i "${FILTER_EXPR}" \
+      -Oz -o "${output_file}"
 
   tabix -p vcf "${output_file}"
 
@@ -67,6 +64,8 @@ for vcf_file in ${vcf_files}; do
 
   echo "Completed: ${output_file}"
   echo "---"
+
+  break
 
 done
 
