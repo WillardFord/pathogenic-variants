@@ -13,3 +13,10 @@ wheels/
 marimo/_static
 marimo/_lsp
 __marimo__
+
+# AI Tools
+agents.md
+
+# VCFs
+*.vcf.gz
+*.vcf.gz.tbi
