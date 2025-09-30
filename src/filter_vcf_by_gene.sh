@@ -21,16 +21,7 @@ done
 
 mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 
-# Build regex for gene filtering (e.g., (GENE1:|GENE2:))
-GENE_PATTERN=$(awk '
-  BEGIN { sep="" }
-  {
-    gene=$0
-    gsub(/[][*+?.(){}^$|\\]/, "\\\\&", gene)
-    printf "%s%s:", sep, gene
-    sep="|"
-  }
-' "${GENE_LIST}")
+GENE_PATTERN=$(paste -sd'|' "${GENE_LIST}")
 
 if [[ -z "${GENE_PATTERN}" ]]; then
   echo "Gene list produced an empty pattern" >&2
