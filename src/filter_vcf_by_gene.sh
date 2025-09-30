@@ -69,39 +69,50 @@ for vcf_file in "${vcf_files[@]}"; do
   local_tbi="${local_vcf}.tbi"
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
   output_tbi="${output_file}.tbi"
+  tmp_filtered="${TMP_DIR}/${prefix}.filtered.bcf"
+  tmp_annotated="${TMP_DIR}/${prefix}.annot.bcf"
 
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
     echo "Skipping existing output for ${prefix}"
-    ((processed+=1))
-    ((skipped+=1))
+    processed=$((processed + 1))
+    skipped=$((skipped + 1))
     continue
   fi
 
   copy_start=$(date +%s)
-  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
-  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
+  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
+  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
   copy_end=$(date +%s)
   echo "Copied: ${vcf_file} to ${local_vcf}"
 
   bc_start=$(date +%s)
-  bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
-    | bcftools annotate \
-        -a "${CLINVAR_ANNOTATION}" \
-        -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-        -Ou - \
-    | bcftools view \
-        -i "${FILTER_EXPR}" \
-        -Oz -o "${output_file}"
+  bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
+
+  if ! bcftools view -H "${tmp_filtered}" | head -n 1 >/dev/null; then
+    echo "No variants remain after BED filter for ${prefix}; skipping."
+    rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
+    skipped=$((skipped + 1))
+    processed=$((processed + 1))
+    continue
+  fi
+
+  bcftools annotate \
+    -a "${CLINVAR_ANNOTATION}" \
+    -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+    -Ob -o "${tmp_annotated}" "${tmp_filtered}"
+  bcftools view \
+    -i "${FILTER_EXPR}" \
+    -Oz -o "${output_file}" "${tmp_annotated}"
   tabix -p vcf "${output_file}"
-  bc_end=$(date +%s)
+  bc_end=(date +%s)
   echo "Filtered: ${vcf_file} to ${output_file}"
 
-  rm -f "${local_vcf}" "${local_tbi}"
+  rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi" "${tmp_annotated}" "${tmp_annotated}.csi"
 
   copy_time_total=$((copy_time_total + (copy_end - copy_start)))
   filter_time_total=$((filter_time_total + (bc_end - bc_start)))
-  ((processed_with_times+=1))
-  ((processed+=1))
+  processed_with_times=$((processed_with_times + 1))
+  processed=$((processed + 1))
 
 done
 
