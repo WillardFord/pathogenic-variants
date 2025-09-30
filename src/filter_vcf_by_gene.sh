@@ -21,6 +21,26 @@ done
 
 mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 
+# Build regex for gene filtering (e.g., (GENE1:|GENE2:))
+GENE_PATTERN=$(awk '
+  BEGIN { sep="" }
+  {
+    gene=$0
+    gsub(/[][*+?.(){}^$|\\]/, "\\\\&", gene)
+    printf "%s%s:", sep, gene
+    sep="|"
+  }
+' "${GENE_LIST}")
+
+if [[ -z "${GENE_PATTERN}" ]]; then
+  echo "Gene list produced an empty pattern" >&2
+  exit 1
+fi
+
+FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
+
+echo "Using filter expression: ${FILTER_EXPR}"
+
 vcf_files=$(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz)
 
 for vcf_file in ${vcf_files}; do
@@ -40,7 +60,7 @@ for vcf_file in ${vcf_files}; do
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
     -Ou "${local_vcf}" \
   | bcftools view \
-    -i "INFO/GENEINFO ~ @${GENE_LIST}" \
+    -i "${FILTER_EXPR}" \
     -Oz -o "${output_file}"
 
   tabix -p vcf "${output_file}"
@@ -51,6 +71,7 @@ for vcf_file in ${vcf_files}; do
   echo "---"
 
   break
+
 done
 
 echo "All VCF files processed successfully!"
