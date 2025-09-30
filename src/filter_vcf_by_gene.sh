@@ -35,38 +35,83 @@ echo "Using filter expression: ${FILTER_EXPR}"
 
 echo "Using region BED: ${GENE_BED}"
 
-vcf_files=$(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz)
+vcf_files=()
+while IFS= read -r line; do
+  [[ -n "${line}" ]] && vcf_files+=("${line}")
+done < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz)
 
-for vcf_file in ${vcf_files}; do
+total=${#vcf_files[@]}
+if (( total == 0 )); then
+  echo "No VCF shards found at ${CLINVAR_BASE_PATH}" >&2
+  exit 0
+fi
+
+echo "Discovered ${total} VCF shard(s) to evaluate."
+
+processed=0
+processed_with_times=0
+skipped=0
+copy_time_total=0
+filter_time_total=0
+
+for vcf_file in "${vcf_files[@]}"; do
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
+  output_tbi="${output_file}.tbi"
 
-  echo "Processing: ${vcf_file}"
-  echo "Output: ${output_file}"
+  if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
+    ((processed++))
+    ((skipped++))
+  else
+    copy_start=$(date +%s)
+    gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
+    gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
+    copy_end=$(date +%s)
 
-  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
-  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
+    bc_start=$(date +%s)
+    bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
+      | bcftools annotate \
+          -a "${CLINVAR_ANNOTATION}" \
+          -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+          -Ou - \
+      | bcftools view \
+          -i "${FILTER_EXPR}" \
+          -Oz -o "${output_file}"
+    tabix -p vcf "${output_file}"
+    bc_end=$(date +%s)
 
-  bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
-  | bcftools annotate \
-      -a "${CLINVAR_ANNOTATION}" \
-      -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-      -Ou - \
-  | bcftools view \
-      -i "${FILTER_EXPR}" \
-      -Oz -o "${output_file}"
+    rm -f "${local_vcf}" "${local_tbi}"
 
-  tabix -p vcf "${output_file}"
+    copy_time_total=$((copy_time_total + (copy_end - copy_start)))
+    filter_time_total=$((filter_time_total + (bc_end - bc_start)))
+    ((processed_with_times++))
+    ((processed++))
+  fi
 
-  rm -f "${local_vcf}" "${local_tbi}"
-
-  echo "Completed: ${output_file}"
-  echo "---"
-
-  break
+  if (( processed % 10 == 0 )); then
+    if (( processed_with_times > 0 )); then
+      avg_copy=$(echo "scale=2; ${copy_time_total} / ${processed_with_times}" | bc)
+      avg_filter=$(echo "scale=2; ${filter_time_total} / ${processed_with_times}" | bc)
+    else
+      avg_copy="n/a"
+      avg_filter="n/a"
+    fi
+    echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
+  fi
 
 done
 
-echo "All VCF files processed successfully!"
+if (( processed % 10 != 0 )); then
+  if (( processed_with_times > 0 )); then
+    avg_copy=$(echo "scale=2; ${copy_time_total} / ${processed_with_times}" | bc)
+    avg_filter=$(echo "scale=2; ${filter_time_total} / ${processed_with_times}" | bc)
+  else
+    avg_copy="n/a"
+    avg_filter="n/a"
+  fi
+  echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
+fi
+
+echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
