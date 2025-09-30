@@ -70,6 +70,7 @@ report_progress() {
 }
 
 for vcf_file in "${vcf_files[@]}"; do
+  echo "Processing: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
@@ -89,7 +90,7 @@ for vcf_file in "${vcf_files[@]}"; do
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
   copy_end=$(date +%s)
-
+  echo "Copied: ${vcf_file} to ${local_vcf}"
   bc_start=$(date +%s)
   bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
     | bcftools annotate \
@@ -101,7 +102,7 @@ for vcf_file in "${vcf_files[@]}"; do
         -Oz -o "${output_file}"
   tabix -p vcf "${output_file}"
   bc_end=$(date +%s)
-
+  echo "Filtered: ${vcf_file} to ${output_file}"
   rm -f "${local_vcf}" "${local_tbi}"
 
   copy_time_total=$((copy_time_total + (copy_end - copy_start)))
