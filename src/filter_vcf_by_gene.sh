@@ -54,25 +54,27 @@ if (( START_INDEX >= total )); then
   exit 1
 fi
 
-processed=$START_INDEX
+last_index=$((total - 1))
+
+processed=${START_INDEX}
 processed_with_times=0
 skipped=0
 copy_time_total=0
 filter_time_total=0
 
 format_avg() {
-  local total=$1
+  local total_time=$1
   local count=$2
   if (( count == 0 )); then
     printf 'n/a'
   else
-    awk -v t="$total" -v c="$count" 'BEGIN { printf "%.2f", t / c }'
+    awk -v t="$total_time" -v c="$count" 'BEGIN { printf "%.2f", t / c }'
   fi
 }
 
 for (( idx=START_INDEX; idx<total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
-  echo "Processing shard ${idx}/${total - 1}: ${vcf_file}"
+  echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
@@ -96,10 +98,10 @@ for (( idx=START_INDEX; idx<total; idx++ )); do
   bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
 
   if ! bcftools view -H "${tmp_filtered}" | grep -q .; then
-    echo "No variants after BED filter; creating empty marker."
+    echo "No variants after BED filter; writing header-only output for ${prefix}."
+    bcftools view -h "${local_vcf}" -Oz -o "${output_file}"
+    tabix -p vcf "${output_file}"
     rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
-    : > "${output_file}"  # create empty zero-byte marker
-    : > "${output_tbi}"
     skipped=$((skipped + 1))
     processed=$((processed + 1))
     continue
