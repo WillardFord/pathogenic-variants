@@ -11,7 +11,7 @@ CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/cl
 CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
-GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
+GENE_BED="${DATA_DIR}/pathogenic_genes_10000bp.bed"
 
 for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
   if [[ ! -f "${path}" ]]; then
@@ -54,6 +54,16 @@ skipped=0
 copy_time_total=0
 filter_time_total=0
 
+format_avg() {
+  local total=$1
+  local count=$2
+  if (( count == 0 )); then
+    printf 'n/a'
+  else
+    awk -v t="$total" -v c="$count" 'BEGIN { printf "%.2f", t / c }'
+  fi
+}
+
 for vcf_file in "${vcf_files[@]}"; do
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
@@ -91,26 +101,16 @@ for vcf_file in "${vcf_files[@]}"; do
   fi
 
   if (( processed % 10 == 0 )); then
-    if (( processed_with_times > 0 )); then
-      avg_copy=$(echo "scale=2; ${copy_time_total} / ${processed_with_times}" | bc)
-      avg_filter=$(echo "scale=2; ${filter_time_total} / ${processed_with_times}" | bc)
-    else
-      avg_copy="n/a"
-      avg_filter="n/a"
-    fi
+    avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+    avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
     echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
   fi
 
 done
 
 if (( processed % 10 != 0 )); then
-  if (( processed_with_times > 0 )); then
-    avg_copy=$(echo "scale=2; ${copy_time_total} / ${processed_with_times}" | bc)
-    avg_filter=$(echo "scale=2; ${filter_time_total} / ${processed_with_times}" | bc)
-  else
-    avg_copy="n/a"
-    avg_filter="n/a"
-  fi
+  avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+  avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
   echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
 fi
 
