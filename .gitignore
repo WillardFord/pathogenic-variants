@@ -20,6 +20,7 @@ agents.md
 # VCFs
 *.vcf.gz
 *.vcf.gz.tbi
+*.gtf.gz
 
 # Output
 output/*

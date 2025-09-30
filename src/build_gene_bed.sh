@@ -6,8 +6,8 @@ PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 DATA_DIR="${PROJECT_ROOT}/data"
 
 GENE_LIST_DEFAULT="${DATA_DIR}/pathogenic_genes.txt"
-GTF_DEFAULT="${DATA_DIR}/gencode.v39.annotation.gtf.gz"
-FLANK_DEFAULT=10000
+GTF_DEFAULT="${DATA_DIR}/gencode.v49.primary_assembly.annotation.gtf.gz"
+FLANK_DEFAULT=1000000
 OUTPUT_DEFAULT="${DATA_DIR}/pathogenic_genes_${FLANK_DEFAULT}bp.bed"
 
 usage() {
@@ -47,28 +47,46 @@ if [[ ! -f "${GTF_PATH}" ]]; then
   exit 1
 fi
 
+if ! command -v bedtools >/dev/null 2>&1; then
+  echo "bedtools not found in PATH" >&2
+  exit 1
+fi
+
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "${TMP_DIR}"' EXIT
 
 GENE_NAMES="${TMP_DIR}/genes.txt"
 RAW_BED="${TMP_DIR}/raw.bed"
 
-# Normalise gene names by stripping trailing colon if present
 sed 's/:$//' "${GENE_LIST}" > "${GENE_NAMES}"
 
-# Extract gene features from the GTF and pad using awk
 zcat -f "${GTF_PATH}" \
-  | awk -F'\t' -v OFS='\t' -v flank="${FLANK}" -v genes="${GENE_NAMES}" '
-      BEGIN { while ((getline g < genes) > 0) keep[g] = 1 }
+  | awk -F'\t' -v OFS='\t' -v flank="${FLANK}" -v list="${GENE_NAMES}" '
+      BEGIN {
+        while ((getline name < list) > 0) {
+          gsub(/^[ \t]+|[ \t]+$/, "", name);
+          if (name != "") keep[name] = 1;
+        }
+      }
       $3 == "gene" {
-        if (match($9, /gene_name "([^"]+)"/, m)) {
-          gene = m[1]
-          if (keep[gene]) {
-            start = $4 - 1 - flank
-            if (start < 0) start = 0
-            end = $5 + flank
-            print $1, start, end, gene
+        gene = "";
+        split($9, attrs, ";");
+        for (i = 1; i <= length(attrs); i++) {
+          entry = attrs[i];
+          gsub(/^[ \t]+|[ \t]+$/, "", entry);
+          if (index(entry, "gene_name") == 1) {
+            split(entry, parts, "\"");
+            if (length(parts) >= 2) {
+              gene = parts[2];
+              break;
+            }
           }
+        }
+        if (gene != "" && (gene in keep)) {
+          start = $4 - 1 - flank;
+          if (start < 0) start = 0;
+          end = $5 + flank;
+          print $1, start, end, gene;
         }
       }
     ' > "${RAW_BED}"
@@ -78,7 +96,6 @@ if [[ ! -s "${RAW_BED}" ]]; then
   exit 1
 fi
 
-# Sort, merge overlapping segments, and keep distinct gene labels
 bedtools sort -i "${RAW_BED}" \
   | bedtools merge -i - -c 4 -o distinct \
   > "${OUTPUT_PATH}"
