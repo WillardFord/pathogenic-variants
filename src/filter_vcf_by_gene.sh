@@ -72,8 +72,8 @@ for vcf_file in "${vcf_files[@]}"; do
 
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
     echo "Skipping existing output for ${prefix}"
-    ((processed++))
-    ((skipped++))
+    ((processed+=1))
+    ((skipped+=1))
     continue
   fi
 
@@ -100,8 +100,8 @@ for vcf_file in "${vcf_files[@]}"; do
 
   copy_time_total=$((copy_time_total + (copy_end - copy_start)))
   filter_time_total=$((filter_time_total + (bc_end - bc_start)))
-  ((processed_with_times++))
-  ((processed++))
+  ((processed_with_times+=1))
+  ((processed+=1))
 
 done
 
