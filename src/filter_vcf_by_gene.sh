@@ -13,6 +13,8 @@ CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
 GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
 
+readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED
+
 for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
   if [[ ! -f "${path}" ]]; then
     echo "Missing required file: ${path}" >&2
@@ -21,18 +23,14 @@ for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "
 done
 
 mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
-
 GENE_PATTERN=$(paste -sd'|' "${GENE_LIST}")
-
 if [[ -z "${GENE_PATTERN}" ]]; then
   echo "Gene list produced an empty pattern" >&2
   exit 1
 fi
-
 FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
 
 echo "Using filter expression: ${FILTER_EXPR}"
-
 echo "Using region BED: ${GENE_BED}"
 
 vcf_files=()
@@ -64,6 +62,13 @@ format_avg() {
   fi
 }
 
+report_progress() {
+  local label=$1
+  local avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+  local avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
+  echo "Progress: ${processed}/${total} | ${label} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
+}
+
 for vcf_file in "${vcf_files[@]}"; do
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
@@ -74,44 +79,44 @@ for vcf_file in "${vcf_files[@]}"; do
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
     ((processed++))
     ((skipped++))
-  else
-    copy_start=$(date +%s)
-    gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
-    gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
-    copy_end=$(date +%s)
-
-    bc_start=$(date +%s)
-    bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
-      | bcftools annotate \
-          -a "${CLINVAR_ANNOTATION}" \
-          -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-          -Ou - \
-      | bcftools view \
-          -i "${FILTER_EXPR}" \
-          -Oz -o "${output_file}"
-    tabix -p vcf "${output_file}"
-    bc_end=$(date +%s)
-
-    rm -f "${local_vcf}" "${local_tbi}"
-
-    copy_time_total=$((copy_time_total + (copy_end - copy_start)))
-    filter_time_total=$((filter_time_total + (bc_end - bc_start)))
-    ((processed_with_times++))
-    ((processed++))
+    if (( processed % 10 == 0 )); then
+      report_progress "skipping"
+    fi
+    continue
   fi
 
+  copy_start=$(date +%s)
+  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
+  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
+  copy_end=$(date +%s)
+
+  bc_start=$(date +%s)
+  bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
+    | bcftools annotate \
+        -a "${CLINVAR_ANNOTATION}" \
+        -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+        -Ou - \
+    | bcftools view \
+        -i "${FILTER_EXPR}" \
+        -Oz -o "${output_file}"
+  tabix -p vcf "${output_file}"
+  bc_end=$(date +%s)
+
+  rm -f "${local_vcf}" "${local_tbi}"
+
+  copy_time_total=$((copy_time_total + (copy_end - copy_start)))
+  filter_time_total=$((filter_time_total + (bc_end - bc_start)))
+  ((processed_with_times++))
+  ((processed++))
+
   if (( processed % 10 == 0 )); then
-    avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-    avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
-    echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
+    report_progress "processing"
   fi
 
 done
 
 if (( processed % 10 != 0 )); then
-  avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-  avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
-  echo "Progress: ${processed}/${total} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
+  report_progress "final"
 fi
 
 echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
