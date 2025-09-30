@@ -11,7 +11,7 @@ CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/cl
 CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
-GENE_BED="${DATA_DIR}/pathogenic_genes_10000bp.bed"
+GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed
 
 for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
   if [[ ! -f "${path}" ]]; then
