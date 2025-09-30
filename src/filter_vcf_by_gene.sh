@@ -62,13 +62,6 @@ format_avg() {
   fi
 }
 
-report_progress() {
-  local label=$1
-  local avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-  local avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
-  echo "Progress: ${processed}/${total} | ${label} | avg copy: ${avg_copy}s | avg filter: ${avg_filter}s"
-}
-
 for vcf_file in "${vcf_files[@]}"; do
   echo "Processing: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
@@ -78,19 +71,18 @@ for vcf_file in "${vcf_files[@]}"; do
   output_tbi="${output_file}.tbi"
 
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
+    echo "Skipping existing output for ${prefix}"
     ((processed++))
     ((skipped++))
-    if (( processed % 10 == 0 )); then
-      report_progress "skipping"
-    fi
     continue
   fi
 
   copy_start=$(date +%s)
-  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
-  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
+  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
+  gsutil -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
   copy_end=$(date +%s)
   echo "Copied: ${vcf_file} to ${local_vcf}"
+
   bc_start=$(date +%s)
   bcftools view -R "${GENE_BED}" -Ou "${local_vcf}" \
     | bcftools annotate \
@@ -103,6 +95,7 @@ for vcf_file in "${vcf_files[@]}"; do
   tabix -p vcf "${output_file}"
   bc_end=$(date +%s)
   echo "Filtered: ${vcf_file} to ${output_file}"
+
   rm -f "${local_vcf}" "${local_tbi}"
 
   copy_time_total=$((copy_time_total + (copy_end - copy_start)))
@@ -110,14 +103,11 @@ for vcf_file in "${vcf_files[@]}"; do
   ((processed_with_times++))
   ((processed++))
 
-  if (( processed % 10 == 0 )); then
-    report_progress "processing"
-  fi
-
 done
 
-if (( processed % 10 != 0 )); then
-  report_progress "final"
-fi
+avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
 
 echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
+echo "Average copy time: ${avg_copy}s"
+echo "Average filter time: ${avg_filter}s"
