@@ -61,8 +61,6 @@ for vcf_file in ${vcf_files}; do
   echo "Completed: ${output_file}"
   echo "---"
 
-  break
-
 done
 
 echo "All VCF files processed successfully!"
