@@ -12,8 +12,9 @@ CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
 GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
+START_INDEX="${START_INDEX:-0}"
 
-readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED
+readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED START_INDEX
 
 for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
   if [[ ! -f "${path}" ]]; then
@@ -33,6 +34,8 @@ FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
 echo "Using filter expression: ${FILTER_EXPR}"
 echo "Using region BED: ${GENE_BED}"
 
+echo "START_INDEX set to ${START_INDEX}"
+
 vcf_files=()
 while IFS= read -r line; do
   [[ -n "${line}" ]] && vcf_files+=("${line}")
@@ -46,7 +49,12 @@ fi
 
 echo "Discovered ${total} VCF shard(s) to evaluate."
 
-processed=0
+if (( START_INDEX >= total )); then
+  echo "START_INDEX (${START_INDEX}) exceeds available shards (${total})." >&2
+  exit 1
+fi
+
+processed=$START_INDEX
 processed_with_times=0
 skipped=0
 copy_time_total=0
@@ -62,8 +70,9 @@ format_avg() {
   fi
 }
 
-for vcf_file in "${vcf_files[@]}"; do
-  echo "Processing: ${vcf_file}"
+for (( idx=START_INDEX; idx<total; idx++ )); do
+  vcf_file="${vcf_files[idx]}"
+  echo "Processing shard ${idx}/${total - 1}: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
@@ -73,9 +82,8 @@ for vcf_file in "${vcf_files[@]}"; do
   tmp_annotated="${TMP_DIR}/${prefix}.annot.bcf"
 
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
-    echo "Skipping existing output for ${prefix}"
+    echo "Already processed (files present)."
     processed=$((processed + 1))
-    skipped=$((skipped + 1))
     continue
   fi
 
@@ -83,14 +91,15 @@ for vcf_file in "${vcf_files[@]}"; do
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
   copy_end=$(date +%s)
-  echo "Copied: ${vcf_file} to ${local_vcf}"
+  echo "Copied: ${vcf_file}"
 
-  bc_start=$(date +%s)
   bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
 
   if ! bcftools view -H "${tmp_filtered}" | grep -q .; then
-    echo "No variants remain after BED filter for ${prefix}; skipping."
+    echo "No variants after BED filter; creating empty marker."
     rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
+    : > "${output_file}"  # create empty zero-byte marker
+    : > "${output_tbi}"
     skipped=$((skipped + 1))
     processed=$((processed + 1))
     continue
@@ -98,6 +107,7 @@ for vcf_file in "${vcf_files[@]}"; do
 
   bcftools index -f "${tmp_filtered}"
 
+  bc_start=$(date +%s)
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
