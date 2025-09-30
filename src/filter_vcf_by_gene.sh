@@ -88,13 +88,15 @@ for vcf_file in "${vcf_files[@]}"; do
   bc_start=$(date +%s)
   bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
 
-  if ! bcftools view -H "${tmp_filtered}" | head -n 1 >/dev/null; then
+  if ! bcftools view -H "${tmp_filtered}" | grep -q .; then
     echo "No variants remain after BED filter for ${prefix}; skipping."
     rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
     skipped=$((skipped + 1))
     processed=$((processed + 1))
     continue
   fi
+
+  bcftools index -f "${tmp_filtered}"
 
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
@@ -104,7 +106,7 @@ for vcf_file in "${vcf_files[@]}"; do
     -i "${FILTER_EXPR}" \
     -Oz -o "${output_file}" "${tmp_annotated}"
   tabix -p vcf "${output_file}"
-  bc_end=(date +%s)
+  bc_end=$(date +%s)
   echo "Filtered: ${vcf_file} to ${output_file}"
 
   rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi" "${tmp_annotated}" "${tmp_annotated}.csi"
