@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# This script filters ClinVar VCF files by gene using the pathogenic genes list.
+
+# It works, but it takes 30 seconds per file * 20,000 files ~ 7 straight days.
+# Need to ask for some guidance lol
+
+
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
