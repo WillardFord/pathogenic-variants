@@ -221,13 +221,13 @@ copy_end=$(date +%s)
 copy_time_total=$((copy_time_total + (copy_end - copy_start)))
 
 # Process downloaded VCFs in batches of 15
-BATCH_SIZE=15
+PROCESS_BATCH_SIZE=15
 total_prefixes=${#to_process_prefixes[@]}
 batch_count=0
 
-for (( i=0; i<total_prefixes; i+=BATCH_SIZE )); do
+for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
   batch_count=$((batch_count + 1))
-  batch_end=$((i + BATCH_SIZE))
+  batch_end=$((i + PROCESS_BATCH_SIZE))
   if (( batch_end > total_prefixes )); then
     batch_end=${total_prefixes}
   fi
