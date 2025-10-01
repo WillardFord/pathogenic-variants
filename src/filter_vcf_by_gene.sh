@@ -43,11 +43,9 @@ echo "START_INDEX set to ${START_INDEX}"
 # Check if we already have a download list - if so, skip interval processing entirely
 if [[ -f "${DOWNLOAD_LIST_PATH}" ]]; then
   echo "Found existing download list at ${DOWNLOAD_LIST_PATH}; skipping interval processing."
-  vcf_files=()
 else
   echo "Listing interval shards..."
   mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
-  vcf_files=()
 
   if (( ${#interval_files[@]} > 0 )); then
     echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
@@ -122,7 +120,6 @@ else
           [[ -z "${shard_id}" ]] && continue
           if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
             shard_selected["${shard_id}"]=1
-            vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
             # Append discovered shard files to the persistent list immediately
             printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz" >> "${DOWNLOAD_LIST_PATH}"
             printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz.tbi" >> "${DOWNLOAD_LIST_PATH}"
@@ -136,30 +133,20 @@ else
       rm -rf "${batch_dir}"
     done
 
-    echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
+    echo "Selected shard(s) after interval screening (skipped ${excluded_intervals})."
   fi
 fi
 
 process_start=0
 
-total=${#vcf_files[@]}
-if (( total == 0 )); then
-  echo "No VCF shards intersect the gene interval list; nothing to do."
-  exit 0
-fi
-
-echo "Processing ${total} VCF shard(s)."
-
-if ! [[ ${process_start} =~ ^[0-9]+$ ]]; then
-  echo "START_INDEX must be a non-negative integer" >&2
+# Download list should always exist at this point
+if [[ ! -f "${DOWNLOAD_LIST_PATH}" ]]; then
+  echo "Download list not found at ${DOWNLOAD_LIST_PATH}. This should not happen." >&2
   exit 1
 fi
 
-if (( process_start >= total )); then
-  echo "START_INDEX (${process_start}) exceeds available shard count (${total})." >&2
-  exit 1
-fi
-
+# We'll get the actual count from the download list
+total=$(awk '{print $0}' "${DOWNLOAD_LIST_PATH}" | sed -E 's#.*/([^/]+)\.vcf\.bgz(\.tbi)?$#\1#' | grep -E '^[0-9]+' | sort -u | wc -l)
 last_index=$((total - 1))
 
 processed=${process_start}
@@ -179,8 +166,6 @@ format_avg() {
 }
 
 
-# TODO, make updates below this line:
-
 # Build a list of shards that still need processing and download them in bulk
 bulk_dir=$(mktemp -d "${TMP_DIR}/vcf_bulk.XXXXXX")
 download_list_file="${DOWNLOAD_LIST_PATH}"
@@ -196,29 +181,30 @@ else
   exit 1
 fi
 
-for (( idx=process_start; idx < total; idx++ )); do
-  vcf_file="${vcf_files[idx]}"
-  prefix=$(basename "${vcf_file}" .vcf.bgz)
+# Check if any outputs are already completed and skip them
+completed_prefixes=()
+for prefix in "${to_process_prefixes[@]}"; do
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
   output_tbi="${output_file}.tbi"
-
+  
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
-    echo "Skipping shard ${idx}/${last_index} (${prefix}): already processed."
+    echo "Skipping shard ${prefix}: already processed."
     skipped=$((skipped + 1))
-    continue
+    completed_prefixes+=("${prefix}")
   fi
+done
 
-  to_process_prefixes+=("${prefix}")
-  printf '%s\n' "${vcf_file}" >> "${download_list_file}"
-  printf '%s\n' "${vcf_file}.tbi" >> "${download_list_file}"
+# Remove completed prefixes from the processing list
+for completed in "${completed_prefixes[@]}"; do
+  to_process_prefixes=("${to_process_prefixes[@]/$completed}")
 done
 
 if (( ${#to_process_prefixes[@]} == 0 )); then
-  echo "Nothing new to process; all ${total} shard(s) already completed."
+  echo "Nothing new to process; all shard(s) already completed."
   rm -rf "${bulk_dir}"
   avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
   avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
-  echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
+  echo "Completed: ${processed} shard(s); skipped ${skipped}."
   echo "Average copy time (processed shards): ${avg_copy}s"
   echo "Average filter time (processed shards): ${avg_filter}s"
   exit 0
