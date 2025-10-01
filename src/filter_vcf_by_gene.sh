@@ -14,7 +14,7 @@ GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
 GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
 GENE_INTERVAL_LIST="${DATA_DIR}/pathogenic_genes_1000000bp.interval_list"
 START_INDEX="${START_INDEX:-0}"
-BATCH_SIZE=100
+BATCH_SIZE=5
 
 readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED GENE_INTERVAL_LIST START_INDEX BATCH_SIZE
 
@@ -44,50 +44,53 @@ vcf_files=()
 if (( ${#interval_files[@]} > 0 )); then
   echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
   excluded_intervals=0
+  declare -A shard_selected=()
+
   index=0
   while (( index < ${#interval_files[@]} )); do
     batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
     index=$((index + ${#batch_paths[@]}))
 
-    interval_args=()
-    tmp_interval_files=()
-    shard_ids=()
+    combined_file=$(mktemp "${TMP_DIR}/batch.XXXXXX.interval_list")
+    overlap_file=$(mktemp "${TMP_DIR}/batch_overlap.XXXXXX.interval_list")
+    header_written=false
+
     for interval_path in "${batch_paths[@]}"; do
       prefix=$(basename "${interval_path}" .interval_list)
       tmp_file=$(mktemp "${TMP_DIR}/${prefix}.XXXXXX.interval_list")
       gsutil -q -u "${GOOGLE_PROJECT}" cp "${interval_path}" "${tmp_file}"
-      interval_args+=("-I" "${tmp_file}")
-      tmp_interval_files+=("${tmp_file}")
-      shard_ids+=("${prefix}")
-    done
 
-    output_dir=$(mktemp -d "${TMP_DIR}/iltools_output.XXXXXX")
-
-    gatk IntervalListTools \
-      "${interval_args[@]}" \
-      -SI "${GENE_INTERVAL_LIST}" \
-      --ACTION OVERLAPS \
-      -O "${output_dir}" \
-      --QUIET true
-
-    for shard_id in "${shard_ids[@]}"; do
-      out_file="${output_dir}/${shard_id}.interval_list"
-      if [[ -f "${out_file}" ]]; then
-        if tail -n +2 "${out_file}" | grep -q .; then
-          vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
-        else
-          excluded_intervals=$((excluded_intervals + 1))
-        fi
-      else
-        excluded_intervals=$((excluded_intervals + 1))
+      if [[ ${header_written} == false ]]; then
+        grep '^@' "${tmp_file}" >> "${combined_file}"
+        header_written=true
       fi
-    done
 
-    rm -rf "${output_dir}"
-    for tmp_file in "${tmp_interval_files[@]}"; do
+      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard":"$5; print }' "${tmp_file}" >> "${combined_file}"
       rm -f "${tmp_file}"
     done
+
+    gatk IntervalListTools \
+      -I "${combined_file}" \
+      -SI "${GENE_INTERVAL_LIST}" \
+      --ACTION OVERLAPS \
+      -O "${overlap_file}" \
+      --QUIET true
+
+    if tail -n +2 "${overlap_file}" | grep -q .; then
+      while IFS= read -r shard_id; do
+        [[ -z "${shard_id}" ]] && continue
+        if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
+          shard_selected["${shard_id}"]=1
+          vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
+        fi
+      done < <(tail -n +2 "${overlap_file}" | awk -F'\t' '{print $5}' | cut -d: -f1 | sort -u)
+    else
+      excluded_intervals=$((excluded_intervals + ${#batch_paths[@]}))
+    fi
+
+    rm -f "${combined_file}" "${overlap_file}"
   done
+
   echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
 fi
 
@@ -135,7 +138,7 @@ format_avg() {
   fi
 }
 
-for (( idx=START_INDEX; idx<total; idx++ )); do
+for (( idx=START_INDEX; idx < total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
   echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
