@@ -15,8 +15,9 @@ GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
 GENE_INTERVAL_LIST="${DATA_DIR}/pathogenic_genes_1000000bp.interval_list"
 START_INDEX="${START_INDEX:-0}"
 BATCH_SIZE=300
+GSUTIL_THREADS=32
 
-readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED GENE_INTERVAL_LIST START_INDEX BATCH_SIZE
+readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED GENE_INTERVAL_LIST START_INDEX BATCH_SIZE GSUTIL_THREADS
 
 for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}" "${GENE_INTERVAL_LIST}"; do
   if [[ ! -f "${path}" ]]; then
@@ -38,6 +39,7 @@ echo "Using gene interval list: ${GENE_INTERVAL_LIST}"
 
 echo "START_INDEX set to ${START_INDEX}"
 
+echo "Listing interval shards..."
 mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
 vcf_files=()
 
@@ -51,23 +53,43 @@ if (( ${#interval_files[@]} > 0 )); then
     batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
     index=$((index + ${#batch_paths[@]}))
 
+    batch_dir=$(mktemp -d "${TMP_DIR}/interval_batch.XXXXXX")
+    batch_list=$(mktemp "${TMP_DIR}/interval_batch_list.XXXXXX.txt")
+    printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
+
+    echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
+    gsutil -m -q \
+      -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
+      -o "GSUtil:parallel_process_count=1" \
+      cp -I "${batch_dir}/" < "${batch_list}"
+    rm -f "${batch_list}"
+
     combined_file=$(mktemp "${TMP_DIR}/batch.XXXXXX.interval_list")
     overlap_file=$(mktemp "${TMP_DIR}/batch_overlap.XXXXXX.interval_list")
     header_written=false
 
     for interval_path in "${batch_paths[@]}"; do
       prefix=$(basename "${interval_path}" .interval_list)
-      tmp_file=$(mktemp "${TMP_DIR}/${prefix}.XXXXXX.interval_list")
-      gsutil -q -u "${GOOGLE_PROJECT}" cp "${interval_path}" "${tmp_file}"
+      local_interval="${batch_dir}/${prefix}.interval_list"
+      if [[ ! -f "${local_interval}" ]]; then
+        echo "Warning: interval ${local_interval} missing after download; skipping shard ${prefix}" >&2
+        excluded_intervals=$((excluded_intervals + 1))
+        continue
+      fi
 
       if [[ ${header_written} == false ]]; then
-        grep '^@' "${tmp_file}" >> "${combined_file}"
+        grep '^@' "${local_interval}" >> "${combined_file}"
         header_written=true
       fi
 
-      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard":"$5; print }' "${tmp_file}" >> "${combined_file}"
-      rm -f "${tmp_file}"
+      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard":"$5; print }' "${local_interval}" >> "${combined_file}"
     done
+
+    if [[ ${header_written} == false ]]; then
+      rm -f "${combined_file}" "${overlap_file}"
+      rm -rf "${batch_dir}"
+      continue
+    fi
 
     gatk IntervalListTools \
       -I "${combined_file}" \
@@ -89,6 +111,7 @@ if (( ${#interval_files[@]} > 0 )); then
     fi
 
     rm -f "${combined_file}" "${overlap_file}"
+    rm -rf "${batch_dir}"
   done
 
   echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
