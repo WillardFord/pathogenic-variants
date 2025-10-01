@@ -257,11 +257,11 @@ for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
   concat_vcf=$(mktemp "${TMP_DIR}/batch_concat.XXXXXX.vcf.bgz")
   echo "Concatenating ${#batch_prefixes[@]} VCF files..."
   bcftools concat -f "${batch_vcf_list}" -Oz -o "${concat_vcf}"
+  tabix -p vcf "${concat_vcf}"
   rm -f "${batch_vcf_list}"
   
   # Annotate and filter the concatenated file
   bc_start=$(date +%s)
-  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -k -Ou \"${concat_vcf}\" | bcftools view -i \"${FILTER_EXPR}\" -Oz -o \"${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz\""
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
