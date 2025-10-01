@@ -220,42 +220,43 @@ gsutil -u "${GOOGLE_PROJECT}" -m \
 copy_end=$(date +%s)
 copy_time_total=$((copy_time_total + (copy_end - copy_start)))
 
-# Process downloaded VCFs in batches of 15 using concat
-PROCESS_BATCH_SIZE=15
+# Process downloaded VCFs in batches with parallelization
+PROCESS_BATCH_SIZE=30
+MAX_PARALLEL_BATCHES=8  # Number of batches to process in parallel
 total_prefixes=${#to_process_prefixes[@]}
 batch_count=0
 
-for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
-  batch_count=$((batch_count + 1))
-  batch_end=$((i + PROCESS_BATCH_SIZE))
-  if (( batch_end > total_prefixes )); then
-    batch_end=${total_prefixes}
-  fi
+# Function to process a single batch
+process_batch() {
+  local batch_num=$1
+  local start_idx=$2
+  local end_idx=$3
+  local batch_prefixes=("${@:4}")
   
-  batch_prefixes=("${to_process_prefixes[@]:i:batch_end-i}")
-  echo "Processing batch ${batch_count}: ${#batch_prefixes[@]} files (${i+1}-${batch_end} of ${total_prefixes})"
+  echo "Processing batch ${batch_num}: ${#batch_prefixes[@]} files (${start_idx}-${end_idx} of ${total_prefixes})"
   
   # Create list of VCF files for this batch
-  batch_vcf_list=$(mktemp "${TMP_DIR}/batch_vcfs.XXXXXX.txt")
+  batch_vcf_list=$(mktemp "${TMP_DIR}/batch_vcfs.${batch_num}.XXXXXX.txt")
   for prefix in "${batch_prefixes[@]}"; do
     local_vcf="${bulk_dir}/${prefix}.vcf.bgz"
     if [[ -f "${local_vcf}" ]]; then
       echo "${local_vcf}" >> "${batch_vcf_list}"
     else
-      echo "Warning: missing ${local_vcf}; skipping from batch." >&2
+      echo "Warning: missing ${local_vcf}; skipping from batch ${batch_num}." >&2
     fi
   done
   
   # Check if we have any files in this batch
   if [[ ! -s "${batch_vcf_list}" ]]; then
-    echo "No valid files in batch ${batch_count}; skipping."
+    echo "No valid files in batch ${batch_num}; skipping."
     rm -f "${batch_vcf_list}"
-    continue
+    return
   fi
   
   # Concat the batch (faster than merge for same samples)
-  concat_vcf=$(mktemp "${TMP_DIR}/batch_concat.XXXXXX.vcf.bgz")
-  echo "Concatenating ${#batch_prefixes[@]} VCF files..."
+  concat_vcf="${OUTPUT_DIR}/batched_vcfs/batch_${batch_num}.vcf.bgz"
+  mkdir -p "${OUTPUT_DIR}/batched_vcfs"
+  echo "Concatenating ${#batch_prefixes[@]} VCF files for batch ${batch_num}..."
   bcftools concat -f "${batch_vcf_list}" -Oz -o "${concat_vcf}"
   tabix -p vcf "${concat_vcf}"
   rm -f "${batch_vcf_list}"
@@ -269,18 +270,35 @@ for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
     -Ou "${concat_vcf}" | \
   bcftools view \
     -i "${FILTER_EXPR}" \
-    -Oz -o "${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
-  tabix -p vcf "${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
+    -Oz -o "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
+  tabix -p vcf "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
   bc_end=$(date +%s)
   
-  echo "Filtered batch ${batch_count}: ${#batch_prefixes[@]} files to ${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
-  filter_time_total=$((filter_time_total + (bc_end - bc_start)))
-  processed_with_times=$((processed_with_times + 1))
-  processed=$((processed + ${#batch_prefixes[@]}))
+  echo "Filtered batch ${batch_num}: ${#batch_prefixes[@]} files to ${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
+  echo "Batched VCF saved to: ${concat_vcf}"
+}
+
+# Process batches in parallel
+for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
+  batch_count=$((batch_count + 1))
+  batch_end=$((i + PROCESS_BATCH_SIZE))
+  if (( batch_end > total_prefixes )); then
+    batch_end=${total_prefixes}
+  fi
   
-  # Clean up concatenated file
-  rm -f "${concat_vcf}"
+  batch_prefixes=("${to_process_prefixes[@]:i:batch_end-i}")
+  
+  # Start batch processing in background
+  process_batch "${batch_count}" "${i}" "${batch_end}" "${batch_prefixes[@]}" &
+  
+  # Limit number of parallel jobs
+  if (( batch_count % MAX_PARALLEL_BATCHES == 0 )); then
+    wait  # Wait for all background jobs to complete
+  fi
 done
+
+# Wait for any remaining background jobs
+wait
 
 # Clean up all bulk-downloaded files
 rm -rf "${bulk_dir}"
