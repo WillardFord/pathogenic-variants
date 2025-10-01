@@ -23,6 +23,11 @@ for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "
   fi
 done
 
+if ! command -v bedtools >/dev/null 2>&1; then
+  echo "bedtools not found in PATH" >&2
+  exit 1
+fi
+
 mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 GENE_PATTERN=$(paste -sd'|' "${GENE_LIST}")
 if [[ -z "${GENE_PATTERN}" ]]; then
@@ -37,20 +42,64 @@ echo "Using region BED: ${GENE_BED}"
 echo "START_INDEX set to ${START_INDEX}"
 
 vcf_files=()
-while IFS= read -r line; do
-  [[ -n "${line}" ]] && vcf_files+=("${line}")
-done < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz)
+interval_files=()
+if mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null); then
+  if (( ${#interval_files[@]} > 0 )); then
+    echo "Found ${#interval_files[@]} interval_list file(s); screening for gene overlap."
+    excluded_intervals=0
+    for interval_path in "${interval_files[@]}"; do
+      prefix=$(basename "${interval_path}" .interval_list)
+      interval_bed=$(mktemp "${TMP_DIR}/${prefix}.interval.XXXXXX.bed")
+      overlap_tmp=$(mktemp "${TMP_DIR}/${prefix}.overlap.XXXXXX.bed")
+
+      gsutil -q -u "${GOOGLE_PROJECT}" cat "${interval_path}" \
+        | awk 'BEGIN{OFS="\t"} !/^@/ {s=$2-1; if (s<0) s=0; print $1, s, $3}' \
+        > "${interval_bed}"
+
+      if [[ ! -s "${interval_bed}" ]]; then
+        echo "Interval list ${prefix} is empty; excluding shard."
+        excluded_intervals=$((excluded_intervals + 1))
+        rm -f "${interval_bed}" "${overlap_tmp}"
+        continue
+      fi
+
+      bedtools intersect -u -a "${interval_bed}" -b "${GENE_BED}" > "${overlap_tmp}"
+      if [[ -s "${overlap_tmp}" ]]; then
+        vcf_files+=("${CLINVAR_BASE_PATH}${prefix}.vcf.bgz")
+      else
+        echo "No overlap with gene BED for shard ${prefix}; excluding."
+        excluded_intervals=$((excluded_intervals + 1))
+      fi
+
+      rm -f "${interval_bed}" "${overlap_tmp}"
+    done
+    echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
+  fi
+fi
+
+if (( ${#vcf_files[@]} == 0 )); then
+  echo "No interval-based selection; defaulting to all VCF shards."
+  if ! mapfile -t vcf_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz 2>/dev/null); then
+    echo "Failed to list VCF shards at ${CLINVAR_BASE_PATH}" >&2
+    exit 1
+  fi
+fi
 
 total=${#vcf_files[@]}
 if (( total == 0 )); then
-  echo "No VCF shards found at ${CLINVAR_BASE_PATH}" >&2
+  echo "No VCF shards intersect the gene BED; nothing to do."
   exit 0
 fi
 
-echo "Discovered ${total} VCF shard(s) to evaluate."
+echo "Processing ${total} VCF shard(s)."
+
+if ! [[ ${START_INDEX} =~ ^[0-9]+$ ]]; then
+  echo "START_INDEX must be a non-negative integer" >&2
+  exit 1
+fi
 
 if (( START_INDEX >= total )); then
-  echo "START_INDEX (${START_INDEX}) exceeds available shards (${total})." >&2
+  echo "START_INDEX (${START_INDEX}) exceeds available shard count (${total})." >&2
   exit 1
 fi
 
@@ -93,6 +142,7 @@ for (( idx=START_INDEX; idx<total; idx++ )); do
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
   gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
   copy_end=$(date +%s)
+  copy_time_total=$((copy_time_total + (copy_end - copy_start)))
   echo "Copied: ${vcf_file}"
 
   bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
@@ -100,7 +150,7 @@ for (( idx=START_INDEX; idx<total; idx++ )); do
   if ! bcftools view -H "${tmp_filtered}" | grep -q .; then
     echo "No variants after BED filter; writing header-only output for ${prefix}."
     bcftools view -h "${local_vcf}" -Oz -o "${output_file}"
-    tabix -p vcf "${output_file}"
+    : > "${output_tbi}"
     rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
     skipped=$((skipped + 1))
     processed=$((processed + 1))
@@ -123,7 +173,6 @@ for (( idx=START_INDEX; idx<total; idx++ )); do
 
   rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi" "${tmp_annotated}" "${tmp_annotated}.csi"
 
-  copy_time_total=$((copy_time_total + (copy_end - copy_start)))
   filter_time_total=$((filter_time_total + (bc_end - bc_start)))
   processed_with_times=$((processed_with_times + 1))
   processed=$((processed + 1))
@@ -134,5 +183,5 @@ avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
 avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
 
 echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
-echo "Average copy time: ${avg_copy}s"
-echo "Average filter time: ${avg_filter}s"
+echo "Average copy time (processed shards): ${avg_copy}s"
+echo "Average filter time (processed shards): ${avg_filter}s"
