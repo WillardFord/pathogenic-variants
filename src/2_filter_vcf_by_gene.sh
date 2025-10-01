@@ -10,7 +10,7 @@ DOWNLOAD_LIST_PATH="${OUTPUT_DIR}/vcf_download_list.txt"
 OUTPUT_DIR="${PROJECT_ROOT}/output/gene_filtered"
 
 CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf/"
-CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
+CLINVAR_ANNOTATION="${DATA_DIR}/clinvar_with_chr.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
 GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
