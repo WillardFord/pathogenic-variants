@@ -220,36 +220,66 @@ gsutil -u "${GOOGLE_PROJECT}" -m \
 copy_end=$(date +%s)
 copy_time_total=$((copy_time_total + (copy_end - copy_start)))
 
-# Process each downloaded VCF locally
-for prefix in "${to_process_prefixes[@]}"; do
-  local_vcf="${bulk_dir}/${prefix}.vcf.bgz"
-  local_tbi="${local_vcf}.tbi"
-  output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
+# Process downloaded VCFs in batches of 15 using concat
+PROCESS_BATCH_SIZE=15
+total_prefixes=${#to_process_prefixes[@]}
+batch_count=0
 
-  echo "Processing ${prefix} from local cache..."
-  if [[ ! -f "${local_vcf}" ]]; then
-    echo "Warning: missing ${local_vcf}; skipping." >&2
+for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
+  batch_count=$((batch_count + 1))
+  batch_end=$((i + PROCESS_BATCH_SIZE))
+  if (( batch_end > total_prefixes )); then
+    batch_end=${total_prefixes}
+  fi
+  
+  batch_prefixes=("${to_process_prefixes[@]:i:batch_end-i}")
+  echo "Processing batch ${batch_count}: ${#batch_prefixes[@]} files (${i+1}-${batch_end} of ${total_prefixes})"
+  
+  # Create list of VCF files for this batch
+  batch_vcf_list=$(mktemp "${TMP_DIR}/batch_vcfs.XXXXXX.txt")
+  for prefix in "${batch_prefixes[@]}"; do
+    local_vcf="${bulk_dir}/${prefix}.vcf.bgz"
+    if [[ -f "${local_vcf}" ]]; then
+      echo "${local_vcf}" >> "${batch_vcf_list}"
+    else
+      echo "Warning: missing ${local_vcf}; skipping from batch." >&2
+    fi
+  done
+  
+  # Check if we have any files in this batch
+  if [[ ! -s "${batch_vcf_list}" ]]; then
+    echo "No valid files in batch ${batch_count}; skipping."
+    rm -f "${batch_vcf_list}"
     continue
   fi
-
+  
+  # Concat the batch (faster than merge for same samples)
+  concat_vcf=$(mktemp "${TMP_DIR}/batch_concat.XXXXXX.vcf.bgz")
+  echo "Concatenating ${#batch_prefixes[@]} VCF files..."
+  bcftools concat -f "${batch_vcf_list}" -Oz -o "${concat_vcf}"
+  rm -f "${batch_vcf_list}"
+  
+  # Annotate and filter the concatenated file
   bc_start=$(date +%s)
-  # First annotate, then filter on the added annotations
-  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -k -Ou \"${local_vcf}\" | bcftools view -i \"${FILTER_EXPR}\" -Oz -o \"${output_file}\""
+  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -k -Ou \"${concat_vcf}\" | bcftools view -i \"${FILTER_EXPR}\" -Oz -o \"${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz\""
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
     -k \
-    -Ou "${local_vcf}" | \
+    -Ou "${concat_vcf}" | \
   bcftools view \
     -i "${FILTER_EXPR}" \
-    -Oz -o "${output_file}"
-  tabix -p vcf "${output_file}"
+    -Oz -o "${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
+  tabix -p vcf "${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
   bc_end=$(date +%s)
-
-  echo "Filtered: ${local_vcf} to ${output_file}"
+  
+  echo "Filtered batch ${batch_count}: ${#batch_prefixes[@]} files to ${OUTPUT_DIR}/batch_${batch_count}_filtered.vcf.bgz"
   filter_time_total=$((filter_time_total + (bc_end - bc_start)))
   processed_with_times=$((processed_with_times + 1))
-  processed=$((processed + 1))
+  processed=$((processed + ${#batch_prefixes[@]}))
+  
+  # Clean up concatenated file
+  rm -f "${concat_vcf}"
 done
 
 # Clean up all bulk-downloaded files
