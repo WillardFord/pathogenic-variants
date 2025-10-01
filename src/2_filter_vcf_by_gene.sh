@@ -262,17 +262,21 @@ process_batch() {
   rm -f "${batch_vcf_list}"
   
   # Annotate and filter the concatenated file
+  : '
+  # This doesnt work and idk why. 2.5 does the same thing but it works.
   bc_start=$(date +%s)
-  bcftools annotate \
-    -a "${CLINVAR_ANNOTATION}" \
-    -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-    -k \
-    -Ou "${concat_vcf}" | \
-  bcftools view \
-    -i "${FILTER_EXPR}" \
-    -Oz -o "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
-  tabix -p vcf "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
-  bc_end=$(date +%s)
+    bcftools annotate \
+      -a "${CLINVAR_ANNOTATION}" \
+      -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+      -k \
+      -Ou "${concat_vcf}" | \
+    bcftools view \
+      -i "${FILTER_EXPR}" \
+      -Oz -o "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
+    tabix -p vcf "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
+    bc_end=$(date +%s)
+  '
+  
   
   echo "Filtered batch ${batch_num}: ${#batch_prefixes[@]} files to ${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
   echo "Batched VCF saved to: ${concat_vcf}"
@@ -303,9 +307,9 @@ wait
 # Clean up all bulk-downloaded files
 rm -rf "${bulk_dir}"
 
-avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
+#avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+#avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
 
 echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
-echo "Average copy time (processed shards): ${avg_copy}s"
-echo "Average filter time (processed shards): ${avg_filter}s"
+#echo "Average copy time (processed shards): ${avg_copy}s"
+#echo "Average filter time (processed shards): ${avg_filter}s"
