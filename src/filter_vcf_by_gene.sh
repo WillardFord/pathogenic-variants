@@ -50,12 +50,14 @@ if (( ${#interval_files[@]} > 0 )); then
     index=$((index + ${#batch_paths[@]}))
 
     interval_args=()
+    tmp_interval_files=()
     shard_ids=()
     for interval_path in "${batch_paths[@]}"; do
       prefix=$(basename "${interval_path}" .interval_list)
-      tmp_file=$(mktemp "${TMP_DIR}/${prefix}.interval_list")
+      tmp_file=$(mktemp "${TMP_DIR}/${prefix}.XXXXXX.interval_list")
       gsutil -q -u "${GOOGLE_PROJECT}" cp "${interval_path}" "${tmp_file}"
       interval_args+=("-I" "${tmp_file}")
+      tmp_interval_files+=("${tmp_file}")
       shard_ids+=("${prefix}")
     done
 
@@ -82,7 +84,9 @@ if (( ${#interval_files[@]} > 0 )); then
     done
 
     rm -rf "${output_dir}"
-    rm -f "${interval_args[@]/-I/}"  # remove temp copies
+    for tmp_file in "${tmp_interval_files[@]}"; do
+      rm -f "${tmp_file}"
+    done
   done
   echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
 fi
@@ -134,7 +138,7 @@ format_avg() {
 for (( idx=START_INDEX; idx<total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
   echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
-  prefix=(basename "${vcf_file}" .vcf.bgz)
+  prefix=$(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
