@@ -46,19 +46,25 @@ vcf_files=()
 if (( ${#interval_files[@]} > 0 )); then
   echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
   excluded_intervals=0
-  declare -A shard_selected=()
+declare -A shard_selected=()
 
-  index=0
-  while (( index < ${#interval_files[@]} )); do
-    batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
-    index=$((index + ${#batch_paths[@]}))
+total_intervals=${#interval_files[@]}
+if (( START_INDEX >= total_intervals )); then
+  echo "START_INDEX (${START_INDEX}) exceeds available interval shards (${total_intervals}); nothing to filter."
+  exit 0
+fi
+
+index=${START_INDEX}
+while (( index < total_intervals )); do
+  batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
+  index=$((index + ${#batch_paths[@]}))
 
     batch_dir=$(mktemp -d "${TMP_DIR}/interval_batch.XXXXXX")
     batch_list=$(mktemp "${TMP_DIR}/interval_batch_list.XXXXXX.txt")
     printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
 
     echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
-    gsutil -u "${GOOGLE_PROJECT}" -m -q \
+    gsutil -m -q \
       -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
       -o "GSUtil:parallel_process_count=1" \
       cp -I "${batch_dir}/" < "${batch_list}"
@@ -82,7 +88,7 @@ if (( ${#interval_files[@]} > 0 )); then
         header_written=true
       fi
 
-      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard":"$5; print }' "${local_interval}" >> "${combined_file}"
+      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard; print }' "${local_interval}" >> "${combined_file}"
     done
 
     if [[ ${header_written} == false ]]; then
@@ -98,14 +104,14 @@ if (( ${#interval_files[@]} > 0 )); then
       -O "${overlap_file}" \
       --QUIET true
 
-    if tail -n +2 "${overlap_file}" | grep -q .; then
+    if tail -n +2 "${overlap_file}" | grep -v '^@' | grep -q .; then
       while IFS= read -r shard_id; do
         [[ -z "${shard_id}" ]] && continue
         if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
           shard_selected["${shard_id}"]=1
           vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
         fi
-      done < <(tail -n +2 "${overlap_file}" | awk -F'\t' '{print $5}' | cut -d: -f1 | sort -u)
+      done < <(tail -n +2 "${overlap_file}" | grep -v '^@' | awk -F'\t' '{print $5}' | sort -u)
     else
       excluded_intervals=$((excluded_intervals + ${#batch_paths[@]}))
     fi
@@ -117,12 +123,15 @@ if (( ${#interval_files[@]} > 0 )); then
   echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
 fi
 
+process_start=0
+
 if (( ${#vcf_files[@]} == 0 )); then
   echo "No interval-based selection; defaulting to all VCF shards."
   if ! mapfile -t vcf_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz 2>/dev/null); then
     echo "Failed to list VCF shards at ${CLINVAR_BASE_PATH}" >&2
     exit 1
   fi
+  process_start=${START_INDEX}
 fi
 
 total=${#vcf_files[@]}
@@ -133,19 +142,19 @@ fi
 
 echo "Processing ${total} VCF shard(s)."
 
-if ! [[ ${START_INDEX} =~ ^[0-9]+$ ]]; then
+if ! [[ ${process_start} =~ ^[0-9]+$ ]]; then
   echo "START_INDEX must be a non-negative integer" >&2
   exit 1
 fi
 
-if (( START_INDEX >= total )); then
-  echo "START_INDEX (${START_INDEX}) exceeds available shard count (${total})." >&2
+if (( process_start >= total )); then
+  echo "START_INDEX (${process_start}) exceeds available shard count (${total})." >&2
   exit 1
 fi
 
 last_index=$((total - 1))
 
-processed=${START_INDEX}
+processed=${process_start}
 processed_with_times=0
 skipped=0
 copy_time_total=0
@@ -161,7 +170,7 @@ format_avg() {
   fi
 }
 
-for (( idx=START_INDEX; idx < total; idx++ )); do
+for (( idx=process_start; idx < total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
   echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
