@@ -39,8 +39,8 @@ echo "Using gene interval list: ${GENE_INTERVAL_LIST}"
 echo "START_INDEX set to ${START_INDEX}"
 
 mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
-
 vcf_files=()
+
 if (( ${#interval_files[@]} > 0 )); then
   echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
   excluded_intervals=0
@@ -49,31 +49,40 @@ if (( ${#interval_files[@]} > 0 )); then
     batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
     index=$((index + ${#batch_paths[@]}))
 
-    interval_in=$(mktemp "${TMP_DIR}/interval_batch.XXXXXX.list")
-    printf '%s
-' "${batch_paths[@]}" > "${interval_in}"
+    interval_args=()
+    shard_ids=()
+    for interval_path in "${batch_paths[@]}"; do
+      prefix=$(basename "${interval_path}" .interval_list)
+      tmp_file=$(mktemp "${TMP_DIR}/${prefix}.interval_list")
+      gsutil -q -u "${GOOGLE_PROJECT}" cp "${interval_path}" "${tmp_file}"
+      interval_args+=("-I" "${tmp_file}")
+      shard_ids+=("${prefix}")
+    done
+
+    output_dir=$(mktemp -d "${TMP_DIR}/iltools_output.XXXXXX")
 
     gatk IntervalListTools \
-      --INPUT_LIST "${interval_in}" \
-      --SECOND_INPUT "${GENE_INTERVAL_LIST}" \
+      "${interval_args[@]}" \
+      -SI "${GENE_INTERVAL_LIST}" \
       --ACTION INTERSECT \
-      --OUTPUT "${TMP_DIR}/iltools_output" \
+      -O "${output_dir}" \
       --QUIET true
 
-    if [[ -d "${TMP_DIR}/iltools_output" ]]; then
-      for out_file in "${TMP_DIR}"/iltools_output/*.interval_list; do
-        [[ -f "${out_file}" ]] || continue
-        shard_id=$(basename "${out_file}" .interval_list)
+    for shard_id in "${shard_ids[@]}"; do
+      out_file="${output_dir}/${shard_id}.interval_list"
+      if [[ -f "${out_file}" ]]; then
         if tail -n +2 "${out_file}" | grep -q .; then
           vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
         else
           excluded_intervals=$((excluded_intervals + 1))
         fi
-      done
-      rm -rf "${TMP_DIR}/iltools_output"
-    fi
+      else
+        excluded_intervals=$((excluded_intervals + 1))
+      fi
+    done
 
-    rm -f "${interval_in}"
+    rm -rf "${output_dir}"
+    rm -f "${interval_args[@]/-I/}"  # remove temp copies
   done
   echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
 fi
@@ -88,7 +97,7 @@ fi
 
 total=${#vcf_files[@]}
 if (( total == 0 )); then
-  echo "No VCF shards intersect the gene target interval list; nothing to do."
+  echo "No VCF shards intersect the gene interval list; nothing to do."
   exit 0
 fi
 
@@ -125,7 +134,7 @@ format_avg() {
 for (( idx=START_INDEX; idx<total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
   echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
-  prefix=$(basename "${vcf_file}" .vcf.bgz)
+  prefix=(basename "${vcf_file}" .vcf.bgz)
   local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
   local_tbi="${local_vcf}.tbi"
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
