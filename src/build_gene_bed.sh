@@ -101,3 +101,15 @@ bedtools sort -i "${RAW_BED}" \
   > "${OUTPUT_PATH}"
 
 echo "Wrote BED to ${OUTPUT_PATH}"
+
+
+
+: '
+# Produce the interval list for comparisons.
+# Where gs://genomics-public-data/references/hg38/v0/Homo_sapiens_assembly38.fasta is reference file
+gatk CreateSequenceDictionary     -R data/Homo_sapiens_assembly38.fasta     -O data/Homo_sapiens_assembly38.dict
+
+bedtools sort -i data/pathogenic_genes_1000000bp.bed > data/pathogenic_genes_1000000bp.sorted.bed
+
+gatk BedToIntervalList     -I data/pathogenic_genes_1000000bp.sorted.bed     -O data/pathogenic_genes_1000000bp.interval_list     -SD data/Homo_sapiens_assembly38.dict
+'

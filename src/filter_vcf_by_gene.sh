@@ -12,21 +12,18 @@ CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
 CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
 GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
 GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
+GENE_INTERVAL_LIST="${DATA_DIR}/pathogenic_genes_1000000bp.interval_list"
 START_INDEX="${START_INDEX:-0}"
+BATCH_SIZE=100
 
-readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED START_INDEX
+readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED GENE_INTERVAL_LIST START_INDEX BATCH_SIZE
 
-for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}"; do
+for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}" "${GENE_INTERVAL_LIST}"; do
   if [[ ! -f "${path}" ]]; then
     echo "Missing required file: ${path}" >&2
     exit 1
   fi
 done
-
-if ! command -v bedtools >/dev/null 2>&1; then
-  echo "bedtools not found in PATH" >&2
-  exit 1
-fi
 
 mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 GENE_PATTERN=$(paste -sd'|' "${GENE_LIST}")
@@ -37,44 +34,48 @@ fi
 FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
 
 echo "Using filter expression: ${FILTER_EXPR}"
-echo "Using region BED: ${GENE_BED}"
+echo "Using gene interval list: ${GENE_INTERVAL_LIST}"
 
 echo "START_INDEX set to ${START_INDEX}"
 
+mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
+
 vcf_files=()
-interval_files=()
-if mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null); then
-  if (( ${#interval_files[@]} > 0 )); then
-    echo "Found ${#interval_files[@]} interval_list file(s); screening for gene overlap."
-    excluded_intervals=0
-    for interval_path in "${interval_files[@]}"; do
-      prefix=$(basename "${interval_path}" .interval_list)
-      interval_bed=$(mktemp "${TMP_DIR}/${prefix}.interval.XXXXXX.bed")
-      overlap_tmp=$(mktemp "${TMP_DIR}/${prefix}.overlap.XXXXXX.bed")
+if (( ${#interval_files[@]} > 0 )); then
+  echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
+  excluded_intervals=0
+  index=0
+  while (( index < ${#interval_files[@]} )); do
+    batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
+    index=$((index + ${#batch_paths[@]}))
 
-      gsutil -q -u "${GOOGLE_PROJECT}" cat "${interval_path}" \
-        | awk 'BEGIN{OFS="\t"} !/^@/ {s=$2-1; if (s<0) s=0; print $1, s, $3}' \
-        > "${interval_bed}"
+    interval_in=$(mktemp "${TMP_DIR}/interval_batch.XXXXXX.list")
+    printf '%s
+' "${batch_paths[@]}" > "${interval_in}"
 
-      if [[ ! -s "${interval_bed}" ]]; then
-        echo "Interval list ${prefix} is empty; excluding shard."
-        excluded_intervals=$((excluded_intervals + 1))
-        rm -f "${interval_bed}" "${overlap_tmp}"
-        continue
-      fi
+    gatk IntervalListTools \
+      --INPUT_LIST "${interval_in}" \
+      --SECOND_INPUT "${GENE_INTERVAL_LIST}" \
+      --ACTION INTERSECT \
+      --OUTPUT "${TMP_DIR}/iltools_output" \
+      --QUIET true
 
-      bedtools intersect -u -a "${interval_bed}" -b "${GENE_BED}" > "${overlap_tmp}"
-      if [[ -s "${overlap_tmp}" ]]; then
-        vcf_files+=("${CLINVAR_BASE_PATH}${prefix}.vcf.bgz")
-      else
-        echo "No overlap with gene BED for shard ${prefix}; excluding."
-        excluded_intervals=$((excluded_intervals + 1))
-      fi
+    if [[ -d "${TMP_DIR}/iltools_output" ]]; then
+      for out_file in "${TMP_DIR}"/iltools_output/*.interval_list; do
+        [[ -f "${out_file}" ]] || continue
+        shard_id=$(basename "${out_file}" .interval_list)
+        if tail -n +2 "${out_file}" | grep -q .; then
+          vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
+        else
+          excluded_intervals=$((excluded_intervals + 1))
+        fi
+      done
+      rm -rf "${TMP_DIR}/iltools_output"
+    fi
 
-      rm -f "${interval_bed}" "${overlap_tmp}"
-    done
-    echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
-  fi
+    rm -f "${interval_in}"
+  done
+  echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
 fi
 
 if (( ${#vcf_files[@]} == 0 )); then
@@ -87,7 +88,7 @@ fi
 
 total=${#vcf_files[@]}
 if (( total == 0 )); then
-  echo "No VCF shards intersect the gene BED; nothing to do."
+  echo "No VCF shards intersect the gene target interval list; nothing to do."
   exit 0
 fi
 
