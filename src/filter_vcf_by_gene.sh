@@ -7,6 +7,7 @@ DATA_DIR="${PROJECT_ROOT}/data"
 OUTPUT_DIR="${PROJECT_ROOT}/output"
 TMP_DIR="${PROJECT_ROOT}/tmp"
 DOWNLOAD_LIST_PATH="${OUTPUT_DIR}/vcf_download_list.txt"
+OUTPUT_DIR="${PROJECT_ROOT}/output/gene_filtered"
 
 CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf/"
 CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
@@ -232,13 +233,13 @@ for prefix in "${to_process_prefixes[@]}"; do
   fi
 
   bc_start=$(date +%s)
+  # Annotate and filter in one pass; output compressed VCF
+  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -i \"${FILTER_EXPR}\" -Oz -o \"${output_file}\" \"${local_vcf}\""
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
     -i "${FILTER_EXPR}" \
-    -k \
-    # Keep variants that are unannotated with GENEINFO
-    -Ob -o "${output_file}" "${local_vcf}"
+    -Oz -o "${output_file}" "${local_vcf}"
   tabix -p vcf "${output_file}"
   bc_end=$(date +%s)
 
