@@ -58,7 +58,7 @@ if (( ${#interval_files[@]} > 0 )); then
     printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
 
     echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
-    gsutil -m -q \
+    gsutil -u "${GOOGLE_PROJECT}" -m -q \
       -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
       -o "GSUtil:parallel_process_count=1" \
       cp -I "${batch_dir}/" < "${batch_list}"
