@@ -6,6 +6,7 @@ PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 DATA_DIR="${PROJECT_ROOT}/data"
 OUTPUT_DIR="${PROJECT_ROOT}/output"
 TMP_DIR="${PROJECT_ROOT}/tmp"
+DOWNLOAD_LIST_PATH="${OUTPUT_DIR}/vcf_download_list.txt"
 
 CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf/"
 CLINVAR_ANNOTATION="${DATA_DIR}/clinvar.vcf.gz"
@@ -39,100 +40,107 @@ echo "Using gene interval list: ${GENE_INTERVAL_LIST}"
 
 echo "START_INDEX set to ${START_INDEX}"
 
-echo "Listing interval shards..."
-mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
-vcf_files=()
+# Check if we already have a download list - if so, skip interval processing entirely
+if [[ -f "${DOWNLOAD_LIST_PATH}" ]]; then
+  echo "Found existing download list at ${DOWNLOAD_LIST_PATH}; skipping interval processing."
+  vcf_files=()
+else
+  echo "Listing interval shards..."
+  mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
+  vcf_files=()
 
-if (( ${#interval_files[@]} > 0 )); then
-  echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
-  excluded_intervals=0
-declare -A shard_selected=()
+  if (( ${#interval_files[@]} > 0 )); then
+    echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
+    excluded_intervals=0
+    declare -A shard_selected=()
 
-total_intervals=${#interval_files[@]}
-if (( START_INDEX >= total_intervals )); then
-  echo "START_INDEX (${START_INDEX}) exceeds available interval shards (${total_intervals}); nothing to filter."
-  exit 0
-fi
+    # Start a fresh persistent download list and append as shards are discovered
+    : > "${DOWNLOAD_LIST_PATH}"
 
-index=${START_INDEX}
-while (( index < total_intervals )); do
-  batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
-  index=$((index + ${#batch_paths[@]}))
+    total_intervals=${#interval_files[@]}
+    if (( START_INDEX >= total_intervals )); then
+      echo "START_INDEX (${START_INDEX}) exceeds available interval shards (${total_intervals}); nothing to filter."
+      exit 0
+    fi
 
-    batch_dir=$(mktemp -d "${TMP_DIR}/interval_batch.XXXXXX")
-    batch_list=$(mktemp "${TMP_DIR}/interval_batch_list.XXXXXX.txt")
-    printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
+    # Iterate over all interval files to determine which vcfs have overlaps with gene interval list.
+    index=${START_INDEX}
+    while (( index < total_intervals )); do
+      batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
+      index=$((index + ${#batch_paths[@]}))
 
-    echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
-    gsutil -u "${GOOGLE_PROJECT}" -m \
-      -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
-      -o "GSUtil:parallel_process_count=1" \
-      cp -I "${batch_dir}/" < "${batch_list}"
-    rm -f "${batch_list}"
+      batch_dir=$(mktemp -d "${TMP_DIR}/interval_batch.XXXXXX")
+      batch_list=$(mktemp "${TMP_DIR}/interval_batch_list.XXXXXX.txt")
+      printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
 
-    combined_file=$(mktemp "${TMP_DIR}/batch.XXXXXX.interval_list")
-    overlap_file=$(mktemp "${TMP_DIR}/batch_overlap.XXXXXX.interval_list")
-    header_written=false
+      echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
+      gsutil -u "${GOOGLE_PROJECT}" -m \
+        -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
+        -o "GSUtil:parallel_process_count=1" \
+        cp -I "${batch_dir}/" < "${batch_list}"
+      rm -f "${batch_list}"
 
-    for interval_path in "${batch_paths[@]}"; do
-      prefix=$(basename "${interval_path}" .interval_list)
-      local_interval="${batch_dir}/${prefix}.interval_list"
-      if [[ ! -f "${local_interval}" ]]; then
-        echo "Warning: interval ${local_interval} missing after download; skipping shard ${prefix}" >&2
-        excluded_intervals=$((excluded_intervals + 1))
+      combined_file=$(mktemp "${TMP_DIR}/batch.XXXXXX.interval_list")
+      overlap_file=$(mktemp "${TMP_DIR}/batch_overlap.XXXXXX.interval_list")
+      header_written=false
+
+      for interval_path in "${batch_paths[@]}"; do
+        prefix=$(basename "${interval_path}" .interval_list)
+        local_interval="${batch_dir}/${prefix}.interval_list"
+        if [[ ! -f "${local_interval}" ]]; then
+          echo "Warning: interval ${local_interval} missing after download; skipping shard ${prefix}" >&2
+          excluded_intervals=$((excluded_intervals + 1))
+          continue
+        fi
+
+        # Prepend the number in name of each individual interval to combined file so we can track which interval is which.
+        if [[ ${header_written} == false ]]; then
+          grep '^@' "${local_interval}" >> "${combined_file}"
+          header_written=true
+        fi
+
+        awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard; print }' "${local_interval}" >> "${combined_file}"
+      done
+
+      if [[ ${header_written} == false ]]; then
+        rm -f "${combined_file}" "${overlap_file}"
+        rm -rf "${batch_dir}"
         continue
       fi
 
-      if [[ ${header_written} == false ]]; then
-        grep '^@' "${local_interval}" >> "${combined_file}"
-        header_written=true
+      # Intersection?
+      gatk IntervalListTools \
+        -I "${combined_file}" \
+        -SI "${GENE_INTERVAL_LIST}" \
+        --ACTION OVERLAPS \
+        -O "${overlap_file}" \
+        --QUIET true
+
+      # If yes, then add corresponding vcfs to to_process list
+      if tail -n +2 "${overlap_file}" | grep -v '^@' | grep -q .; then
+        while IFS= read -r shard_id; do
+          [[ -z "${shard_id}" ]] && continue
+          if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
+            shard_selected["${shard_id}"]=1
+            vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
+            # Append discovered shard files to the persistent list immediately
+            printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz" >> "${DOWNLOAD_LIST_PATH}"
+            printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz.tbi" >> "${DOWNLOAD_LIST_PATH}"
+          fi
+        done < <(tail -n +2 "${overlap_file}" | grep -v '^@' | awk -F'\t' '{print $5}' | sort -u)
+      else
+        excluded_intervals=$((excluded_intervals + ${#batch_paths[@]}))
       fi
 
-      awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard; print }' "${local_interval}" >> "${combined_file}"
-    done
-
-    if [[ ${header_written} == false ]]; then
       rm -f "${combined_file}" "${overlap_file}"
       rm -rf "${batch_dir}"
-      continue
-    fi
+    done
 
-    gatk IntervalListTools \
-      -I "${combined_file}" \
-      -SI "${GENE_INTERVAL_LIST}" \
-      --ACTION OVERLAPS \
-      -O "${overlap_file}" \
-      --QUIET true
-
-    if tail -n +2 "${overlap_file}" | grep -v '^@' | grep -q .; then
-      while IFS= read -r shard_id; do
-        [[ -z "${shard_id}" ]] && continue
-        if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
-          shard_selected["${shard_id}"]=1
-          vcf_files+=("${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz")
-        fi
-      done < <(tail -n +2 "${overlap_file}" | grep -v '^@' | awk -F'\t' '{print $5}' | sort -u)
-    else
-      excluded_intervals=$((excluded_intervals + ${#batch_paths[@]}))
-    fi
-
-    rm -f "${combined_file}" "${overlap_file}"
-    rm -rf "${batch_dir}"
-  done
-
-  echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
+    echo "Selected ${#vcf_files[@]} shard(s) after interval screening (skipped ${excluded_intervals})."
+  fi
 fi
 
 process_start=0
-
-if (( ${#vcf_files[@]} == 0 )); then
-  echo "No interval-based selection; defaulting to all VCF shards."
-  if ! mapfile -t vcf_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.vcf.bgz 2>/dev/null); then
-    echo "Failed to list VCF shards at ${CLINVAR_BASE_PATH}" >&2
-    exit 1
-  fi
-  process_start=${START_INDEX}
-fi
 
 total=${#vcf_files[@]}
 if (( total == 0 )); then
@@ -170,63 +178,92 @@ format_avg() {
   fi
 }
 
+
+# TODO, make updates below this line:
+
+# Build a list of shards that still need processing and download them in bulk
+bulk_dir=$(mktemp -d "${TMP_DIR}/vcf_bulk.XXXXXX")
+download_list_file="${DOWNLOAD_LIST_PATH}"
+to_process_prefixes=()
+
+# Always derive prefixes from the persistent download list
+if [[ -f "${download_list_file}" ]]; then
+  echo "Using download list at ${download_list_file}."
+  mapfile -t to_process_prefixes < <(awk '{print $0}' "${download_list_file}" | sed -E 's#.*/([^/]+)\.vcf\.bgz(\.tbi)?$#\1#' | grep -E '^[0-9]+' | sort -u)
+else
+  echo "Download list not found at ${download_list_file}. Interval screening should have created it." >&2
+  rm -rf "${bulk_dir}"
+  exit 1
+fi
+
 for (( idx=process_start; idx < total; idx++ )); do
   vcf_file="${vcf_files[idx]}"
-  echo "Processing shard ${idx}/${last_index}: ${vcf_file}"
   prefix=$(basename "${vcf_file}" .vcf.bgz)
-  local_vcf="${TMP_DIR}/${prefix}.vcf.bgz"
-  local_tbi="${local_vcf}.tbi"
   output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
   output_tbi="${output_file}.tbi"
-  tmp_filtered="${TMP_DIR}/${prefix}.filtered.bcf"
-  tmp_annotated="${TMP_DIR}/${prefix}.annot.bcf"
 
   if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
-    echo "Already processed (files present)."
-    processed=$((processed + 1))
-    continue
-  fi
-
-  copy_start=$(date +%s)
-  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}" "${local_vcf}"
-  gsutil -q -u "${GOOGLE_PROJECT}" cp "${vcf_file}.tbi" "${local_tbi}"
-  copy_end=$(date +%s)
-  copy_time_total=$((copy_time_total + (copy_end - copy_start)))
-  echo "Copied: ${vcf_file}"
-
-  bcftools view -R "${GENE_BED}" -Ob -o "${tmp_filtered}" "${local_vcf}"
-
-  if ! bcftools view -H "${tmp_filtered}" | grep -q .; then
-    echo "No variants after BED filter; writing header-only output for ${prefix}."
-    bcftools view -h "${local_vcf}" -Oz -o "${output_file}"
-    : > "${output_tbi}"
-    rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi"
+    echo "Skipping shard ${idx}/${last_index} (${prefix}): already processed."
     skipped=$((skipped + 1))
-    processed=$((processed + 1))
     continue
   fi
 
-  bcftools index -f "${tmp_filtered}"
+  to_process_prefixes+=("${prefix}")
+  printf '%s\n' "${vcf_file}" >> "${download_list_file}"
+  printf '%s\n' "${vcf_file}.tbi" >> "${download_list_file}"
+done
+
+if (( ${#to_process_prefixes[@]} == 0 )); then
+  echo "Nothing new to process; all ${total} shard(s) already completed."
+  rm -rf "${bulk_dir}"
+  avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
+  avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
+  echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
+  echo "Average copy time (processed shards): ${avg_copy}s"
+  echo "Average filter time (processed shards): ${avg_filter}s"
+  exit 0
+fi
+
+echo "Bulk downloading ${#to_process_prefixes[@]} shard(s) to ${bulk_dir} using parallel gsutil..."
+copy_start=$(date +%s)
+gsutil -u "${GOOGLE_PROJECT}" -m \
+  -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
+  -o "GSUtil:parallel_process_count=1" \
+  cp -I "${bulk_dir}/" < "${download_list_file}"
+copy_end=$(date +%s)
+copy_time_total=$((copy_time_total + (copy_end - copy_start)))
+
+# Process each downloaded VCF locally
+for prefix in "${to_process_prefixes[@]}"; do
+  local_vcf="${bulk_dir}/${prefix}.vcf.bgz"
+  local_tbi="${local_vcf}.tbi"
+  output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
+
+  echo "Processing ${prefix} from local cache..."
+  if [[ ! -f "${local_vcf}" ]]; then
+    echo "Warning: missing ${local_vcf}; skipping." >&2
+    continue
+  fi
 
   bc_start=$(date +%s)
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-    -Ob -o "${tmp_annotated}" "${tmp_filtered}"
-  bcftools view \
     -i "${FILTER_EXPR}" \
-    -Oz -o "${output_file}" "${tmp_annotated}"
+    -k \
+    # Keep variants that are unannotated with GENEINFO
+    -Ob -o "${output_file}" "${local_vcf}"
   tabix -p vcf "${output_file}"
   bc_end=$(date +%s)
-  echo "Filtered: ${vcf_file} to ${output_file}"
 
-  rm -f "${local_vcf}" "${local_tbi}" "${tmp_filtered}" "${tmp_filtered}.csi" "${tmp_annotated}" "${tmp_annotated}.csi"
-
+  echo "Filtered: ${local_vcf} to ${output_file}"
   filter_time_total=$((filter_time_total + (bc_end - bc_start)))
   processed_with_times=$((processed_with_times + 1))
   processed=$((processed + 1))
-
 done
+
+# Clean up all bulk-downloaded files
+rm -rf "${bulk_dir}"
 
 avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
 avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
