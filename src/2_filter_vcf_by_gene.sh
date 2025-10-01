@@ -256,7 +256,7 @@ for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
   # Merge the batch
   merged_vcf=$(mktemp "${TMP_DIR}/batch_merged.XXXXXX.vcf.bgz")
   echo "Merging ${#batch_prefixes[@]} VCF files..."
-  bcftools merge -l "${batch_vcf_list}" -Oz -o "${merged_vcf}"
+  bcftools merge -l "${batch_vcf_list}" --force-samples -Oz -o "${merged_vcf}"
   rm -f "${batch_vcf_list}"
   
   # Annotate and filter the merged file
