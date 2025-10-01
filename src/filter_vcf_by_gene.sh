@@ -66,7 +66,7 @@ if (( ${#interval_files[@]} > 0 )); then
     gatk IntervalListTools \
       "${interval_args[@]}" \
       -SI "${GENE_INTERVAL_LIST}" \
-      --ACTION INTERSECT \
+      --ACTION OVERLAPS \
       -O "${output_dir}" \
       --QUIET true
 
