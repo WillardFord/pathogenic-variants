@@ -233,13 +233,16 @@ for prefix in "${to_process_prefixes[@]}"; do
   fi
 
   bc_start=$(date +%s)
-  # Annotate and filter in one pass; output compressed VCF
-  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -i \"${FILTER_EXPR}\" -Oz -o \"${output_file}\" \"${local_vcf}\""
+  # First annotate, then filter on the added annotations
+  echo "Running: bcftools annotate -a \"${CLINVAR_ANNOTATION}\" -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -k -Ou \"${local_vcf}\" | bcftools view -i \"${FILTER_EXPR}\" -Oz -o \"${output_file}\""
   bcftools annotate \
     -a "${CLINVAR_ANNOTATION}" \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
+    -k \
+    -Ou "${local_vcf}" | \
+  bcftools view \
     -i "${FILTER_EXPR}" \
-    -Oz -o "${output_file}" "${local_vcf}"
+    -Oz -o "${output_file}"
   tabix -p vcf "${output_file}"
   bc_end=$(date +%s)
 
