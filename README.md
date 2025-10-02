@@ -1,11 +1,15 @@
+# Pathogenic Variants in all of us
 
-## Automated ClinVar Filtering Script
+Using the ACMG v3.3 list of pathogenic variants
 
-The repository ships with `src/filter_vcf_by_gene.sh`, a resumable pipeline that batches ClinVar shards, screens their Picard `interval_list` files against the gene target list, and then annotates only the overlapping VCFs. Key behavior:
+After running files in src from 0 to 3. (2.5 and 3 won't run as executables for some reason but you can copy and paste code. I've no idea why they don't produce the same result)
 
-- Uses `gsutil ls` plus `gsutil -m cp` to stage interval lists in batches (`BATCH_SIZE`, default 300) with parallel threads (`GSUTIL_THREADS`).
-- Builds a combined interval list per batch, tagging each record with its shard ID, then runs `IntervalListTools --ACTION OVERLAPS` against `data/pathogenic_genes_1000000bp.interval_list` to find overlapping shards quickly.
-- Honors `START_INDEX` for both interval screening and VCF processing so reruns can resume midstream.
-- When a BED-filtered BCF has no variants, emits a header-only VCF and placeholder `.tbi`, increments `skipped`, and moves on without attempting ClinVar annotation.
+This will produce a bunch of vcfs containing only pathogenic and likely pathogenic variants inside all the genes from the stated list across several batched vcfs. 
 
-Run from the repo root with environment variables set (at minimum `GOOGLE_PROJECT`; optionally override `START_INDEX`, `BATCH_SIZE`, or `GSUTIL_THREADS`).
+Next steps:
+1. Combine them into a single vcf
+2. Parse presence of pathogenic variant in each individual not by clinvar label but by acmg definition of pathogenic which is slightly different for some genes. Then We can do summary statistics questions
+3. Parse information about individuals
+  - Phenotyping of relevant diseases
+  - Ancestry
+  - Covariates (age/sex/etc)
