@@ -5,25 +5,37 @@ Paths are hard-coded so the script can be executed directly.
 """
 
 from __future__ import annotations
-
+from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 from cyvcf2 import VCF
-from typing import Any
+
 
 VCF_PATH = Path("output/gene_filtered/filtered_pathogenic_vcfs/combined.vcf.gz")
 OUTPUT_PATH = Path("output/prevalence/carrier_count.txt")
 PATHOGENICITY_REQUIREMENTS_PATH = Path("data/ACMG SF Annotations Download - ACMG SF v3.3 List.tsv")
 
+# Pre-load gene pathogenicity requirements from the file into a dictionary for efficient lookup.
+def load_pathogenicity_requirements(path: Path) -> dict[str, str]:
+    requirements = {}
+    with path.open() as handle:
+        for line in handle:
+            if line.startswith("Gene"):
+                continue
+            fields = line.rstrip('\n').split('\t')
+            # ACMG gene symbol is field[0], requirement is field[7]
+            requirements[fields[0].strip().lower()] = fields[7].strip()
+    return requirements
+
+GENE_PATHOGENICITY_REQUIREMENTS = load_pathogenicity_requirements(PATHOGENICITY_REQUIREMENTS_PATH)
+
 def get_pathogenicity_requirements(geneinfo: str) -> str:
     """Return the pathogenicity requirements for a gene."""
-    with PATHOGENICITY_REQUIREMENTS_PATH.open() as handle:
-        for line in handle:
-            # Skip the header
-            if line.startswith("Gene"): continue
-            fields = line.rstrip('\n').split('\t')
-            if fields[0].lower() not in geneinfo.lower(): continue
-            return fields[7]
+    # Try to find gene requirement by substring matching
+    for gene, req in GENE_PATHOGENICITY_REQUIREMENTS.items():
+        if gene in geneinfo.lower():
+            return req
     raise ValueError(f"No pathogenicity requirements found for {geneinfo}")
 
 def pathogenic_variant(alleles: list[int], geneinfo: str, row: dict[str, Any]) -> bool:
@@ -60,7 +72,7 @@ def pathogenic_variant(alleles: list[int], geneinfo: str, row: dict[str, Any]) -
             return False
 
 def main() -> None:
-    carriers = set()
+    carriers: dict[str, list[str]] = defaultdict(list)
     vcf = VCF(str(VCF_PATH))
     samples = vcf.samples
     try:
@@ -75,21 +87,35 @@ def main() -> None:
                 alleles = genotype[:-1]
                 if not alleles:
                     continue
-                pathogenic = pathogenic_variant(alleles, record.INFO.get("GENEINFO"), record)
+                pathogenic = pathogenic_variant(alleles, record.INFO.get("GENEINFO"), record, carriers[samples[idx]])
                 if pathogenic == "Het":
-                    pass
+                    carriers[samples[idx]].append(record.INFO.get("GENEINFO")+"_het")
                 elif pathogenic == True:
-                    carriers.add(samples[idx])
+                    carriers[samples[idx]].append(record.INFO.get("GENEINFO"))
 
     finally:
         vcf.close()
 
+    for sample, genes in carriers.items():
+        cleaned_genes = []
+        gene_set = set(genes)
+        for gene in genes:
+            if gene.endswith("_het") and genes.count(gene) < 2:
+                continue
+            else:
+                cleaned_genes.append(gene)
+        if len(cleaned_genes) == 0:
+            del carriers[sample]
+        carriers[sample] = cleaned_genes
+
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     count = len(carriers)
+
+    # TODO change carriers
     with OUTPUT_PATH.open("w") as handle:
         handle.write(f"carrier_count\t{count}\n")
-        for sample in sorted(carriers):
-            handle.write(f"{sample}\n")
+        for sample, genes in carriers.items():
+            handle.write(f"{sample}\t{'\t'.join(genes)}\n")
 
 
 if __name__ == "__main__":
