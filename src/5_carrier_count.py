@@ -13,6 +13,18 @@ from typing import Any
 
 VCF_PATH = Path("output/gene_filtered/filtered_pathogenic_vcfs/combined.vcf.gz")
 OUTPUT_PATH = Path("output/prevalence/carrier_count.txt")
+PATHOGENICITY_REQUIREMENTS_PATH = Path("data/ACMG SF Annotations Download - ACMG SF v3.3 List.tsv")
+
+def get_pathogenicity_requirements(geneinfo: str) -> str:
+    """Return the pathogenicity requirements for a gene."""
+    with PATHOGENICITY_REQUIREMENTS_PATH.open() as handle:
+        for line in handle:
+            # Skip the header
+            if line.startswith("Gene"): continue
+            fields = line.rstrip('\n').split('\t')
+            if fields[0].lower() not in geneinfo.lower(): continue
+            return fields[7]
+    raise ValueError(f"No pathogenicity requirements found for {geneinfo}")
 
 def pathogenic_variant(alleles: list[int], geneinfo: str, row: dict[str, Any]) -> bool:
     gene_pathogenicity_requirements = get_pathogenicity_requirements(geneinfo)
