@@ -23,3 +23,11 @@ for f in "${INPUT_DIR}"/*.vcf.bgz; do
 done
 wait
 '
+
+"
+# Concatonation
+OUTPUT_DIR="output/"
+ls -1v "${OUTPUT_DIR}"/*.vcf.bgz > "${OUTPUT_DIR}/file_list.txt"
+bcftools concat -f "${OUTPUT_DIR}/file_list.txt" -Oz -o "${OUTPUT_DIR}/combined.vcf.gz"
+bcftools index "${OUTPUT_DIR}/combined.vcf.gz"
+"
