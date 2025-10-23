@@ -87,7 +87,7 @@ def main() -> None:
                 alleles = genotype[:-1]
                 if not alleles:
                     continue
-                pathogenic = pathogenic_variant(alleles, record.INFO.get("GENEINFO"), record, carriers[samples[idx]])
+                pathogenic = pathogenic_variant(alleles, record.INFO.get("GENEINFO"), record)
                 if pathogenic == "Het":
                     carriers[samples[idx]].append(record.INFO.get("GENEINFO")+"_het")
                 elif pathogenic == True:
