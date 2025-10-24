@@ -1,315 +1,215 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
+
+# This script screens every interval_list shard in output/interval_lists
+# for overlap against the configured gene interval list. Shards that overlap
+# have their matching remote VCF paths recorded in output/vcf_download_list.txt,
+# and their individual overlap interval_lists are written to
+# data/interval_lists_with_overlapping_ranges/.
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
+
 DATA_DIR="${PROJECT_ROOT}/data"
 OUTPUT_DIR="${PROJECT_ROOT}/output"
 TMP_DIR="${PROJECT_ROOT}/tmp"
-DOWNLOAD_LIST_PATH="${OUTPUT_DIR}/vcf_download_list.txt"
-OUTPUT_DIR="${PROJECT_ROOT}/output/gene_filtered"
 
-CLINVAR_BASE_PATH="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf/"
-CLINVAR_ANNOTATION="${DATA_DIR}/clinvar_with_chr.vcf.gz"
-CLINVAR_ANNOTATION_TBI="${CLINVAR_ANNOTATION}.tbi"
-GENE_LIST="${DATA_DIR}/pathogenic_genes.txt"
-GENE_BED="${DATA_DIR}/pathogenic_genes_1000000bp.bed"
+INTERVAL_LIST_DIR="${OUTPUT_DIR}/interval_lists"
+INTERMEDIATE_DIR="${DATA_DIR}/interval_lists_with_overlapping_ranges"
+DOWNLOAD_LIST="${OUTPUT_DIR}/vcf_download_list.txt"
+INTERVAL_LISTS_WITH_OVERLAP="${OUTPUT_DIR}/interval_lists_with_overlaps.txt"
 GENE_INTERVAL_LIST="${DATA_DIR}/pathogenic_genes_1000000bp.interval_list"
-START_INDEX="${START_INDEX:-0}"
-BATCH_SIZE=300
-GSUTIL_THREADS=32
+REMOTE_VCF_BASE="${REMOTE_VCF_BASE:-gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf}"
+MAX_JOBS="${MAX_JOBS:-}"
 
-readonly CLINVAR_BASE_PATH CLINVAR_ANNOTATION CLINVAR_ANNOTATION_TBI GENE_LIST GENE_BED GENE_INTERVAL_LIST START_INDEX BATCH_SIZE GSUTIL_THREADS
+RESULTS_DIR=""
+fifo_fd_open=0
 
-for path in "${CLINVAR_ANNOTATION}" "${CLINVAR_ANNOTATION_TBI}" "${GENE_LIST}" "${GENE_BED}" "${GENE_INTERVAL_LIST}"; do
-  if [[ ! -f "${path}" ]]; then
-    echo "Missing required file: ${path}" >&2
-    exit 1
+cleanup() {
+  if (( fifo_fd_open )); then
+    exec 9>&-
+    exec 9<&-
+    fifo_fd_open=0
   fi
-done
-
-mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
-GENE_PATTERN=$(paste -sd'|' "${GENE_LIST}")
-if [[ -z "${GENE_PATTERN}" ]]; then
-  echo "Gene list produced an empty pattern" >&2
-  exit 1
-fi
-FILTER_EXPR="INFO/GENEINFO ~ \"(${GENE_PATTERN})\""
-
-echo "Using filter expression: ${FILTER_EXPR}"
-echo "Using gene interval list: ${GENE_INTERVAL_LIST}"
-
-echo "START_INDEX set to ${START_INDEX}"
-
-# Check if we already have a download list - if so, skip interval processing entirely
-if [[ -f "${DOWNLOAD_LIST_PATH}" ]]; then
-  echo "Found existing download list at ${DOWNLOAD_LIST_PATH}; skipping interval processing."
-else
-  echo "Listing interval shards..."
-  mapfile -t interval_files < <(gsutil -u "${GOOGLE_PROJECT}" ls "${CLINVAR_BASE_PATH}"*.interval_list 2>/dev/null)
-
-  if (( ${#interval_files[@]} > 0 )); then
-    echo "Found ${#interval_files[@]} interval_list file(s); screening in batches of ${BATCH_SIZE}."
-    excluded_intervals=0
-    declare -A shard_selected=()
-
-    # Start a fresh persistent download list and append as shards are discovered
-    : > "${DOWNLOAD_LIST_PATH}"
-
-    total_intervals=${#interval_files[@]}
-    if (( START_INDEX >= total_intervals )); then
-      echo "START_INDEX (${START_INDEX}) exceeds available interval shards (${total_intervals}); nothing to filter."
-      exit 0
-    fi
-
-    # Iterate over all interval files to determine which vcfs have overlaps with gene interval list.
-    index=${START_INDEX}
-    while (( index < total_intervals )); do
-      batch_paths=("${interval_files[@]:index:BATCH_SIZE}")
-      index=$((index + ${#batch_paths[@]}))
-
-      batch_dir=$(mktemp -d "${TMP_DIR}/interval_batch.XXXXXX")
-      batch_list=$(mktemp "${TMP_DIR}/interval_batch_list.XXXXXX.txt")
-      printf '%s\n' "${batch_paths[@]}" > "${batch_list}"
-
-      echo "Downloading interval batch to ${batch_dir} (size=${#batch_paths[@]})"
-      gsutil -u "${GOOGLE_PROJECT}" -m \
-        -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
-        -o "GSUtil:parallel_process_count=1" \
-        cp -I "${batch_dir}/" < "${batch_list}"
-      rm -f "${batch_list}"
-
-      combined_file=$(mktemp "${TMP_DIR}/batch.XXXXXX.interval_list")
-      overlap_file=$(mktemp "${TMP_DIR}/batch_overlap.XXXXXX.interval_list")
-      header_written=false
-
-      for interval_path in "${batch_paths[@]}"; do
-        prefix=$(basename "${interval_path}" .interval_list)
-        local_interval="${batch_dir}/${prefix}.interval_list"
-        if [[ ! -f "${local_interval}" ]]; then
-          echo "Warning: interval ${local_interval} missing after download; skipping shard ${prefix}" >&2
-          excluded_intervals=$((excluded_intervals + 1))
-          continue
-        fi
-
-        # Prepend the number in name of each individual interval to combined file so we can track which interval is which.
-        if [[ ${header_written} == false ]]; then
-          grep '^@' "${local_interval}" >> "${combined_file}"
-          header_written=true
-        fi
-
-        awk -v shard="${prefix}" 'BEGIN{OFS="\t"} !/^@/ { $5 = shard; print }' "${local_interval}" >> "${combined_file}"
-      done
-
-      if [[ ${header_written} == false ]]; then
-        rm -f "${combined_file}" "${overlap_file}"
-        rm -rf "${batch_dir}"
-        continue
-      fi
-
-      # Intersection?
-      gatk IntervalListTools \
-        -I "${combined_file}" \
-        -SI "${GENE_INTERVAL_LIST}" \
-        --ACTION OVERLAPS \
-        -O "${overlap_file}" \
-        --QUIET true
-
-      # If yes, then add corresponding vcfs to to_process list
-      if tail -n +2 "${overlap_file}" | grep -v '^@' | grep -q .; then
-        while IFS= read -r shard_id; do
-          [[ -z "${shard_id}" ]] && continue
-          if [[ -z "${shard_selected[${shard_id}]:-}" ]]; then
-            shard_selected["${shard_id}"]=1
-            # Append discovered shard files to the persistent list immediately
-            printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz" >> "${DOWNLOAD_LIST_PATH}"
-            printf '%s\n' "${CLINVAR_BASE_PATH}${shard_id}.vcf.bgz.tbi" >> "${DOWNLOAD_LIST_PATH}"
-          fi
-        done < <(tail -n +2 "${overlap_file}" | grep -v '^@' | awk -F'\t' '{print $5}' | sort -u)
-      else
-        excluded_intervals=$((excluded_intervals + ${#batch_paths[@]}))
-      fi
-
-      rm -f "${combined_file}" "${overlap_file}"
-      rm -rf "${batch_dir}"
-    done
-
-    echo "Selected shard(s) after interval screening (skipped ${excluded_intervals})."
+  if [[ -n "${RESULTS_DIR}" && -d "${RESULTS_DIR}" ]]; then
+    rm -rf "${RESULTS_DIR}"
   fi
-fi
+}
+trap cleanup EXIT
 
-process_start=0
-
-# Download list should always exist at this point
-if [[ ! -f "${DOWNLOAD_LIST_PATH}" ]]; then
-  echo "Download list not found at ${DOWNLOAD_LIST_PATH}. This should not happen." >&2
+die() {
+  echo "Error: $*" >&2
   exit 1
-fi
+}
 
-# We'll get the actual count from the download list
-total=$(awk '{print $0}' "${DOWNLOAD_LIST_PATH}" | sed -E 's#.*/([^/]+)\.vcf\.bgz(\.tbi)?$#\1#' | grep -E '^[0-9]+' | sort -u | wc -l)
-last_index=$((total - 1))
+detect_default_jobs() {
+  if command -v nproc >/dev/null 2>&1; then
+    nproc
+    return
+  fi
+  local uname_out
+  uname_out=$(uname -s 2>/dev/null || echo "")
+  case "${uname_out}" in
+    Darwin)
+      sysctl -n hw.ncpu 2>/dev/null || echo 4
+      ;;
+    *)
+      getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4
+      ;;
+  esac
+}
 
-processed=${process_start}
-processed_with_times=0
-skipped=0
-copy_time_total=0
-filter_time_total=0
+run_overlap() {
+  local interval_path="$1"
+  local result_dir="$2"
+  local base prefix overlap_path hit_file
 
-format_avg() {
-  local total_time=$1
-  local count=$2
-  if (( count == 0 )); then
-    printf 'n/a'
-  else
-    awk -v t="$total_time" -v c="$count" 'BEGIN { printf "%.2f", t / c }'
+  base=$(basename "${interval_path}")
+  prefix="${base%.interval_list}"
+  overlap_path="${INTERMEDIATE_DIR}/${prefix}.overlap.interval_list"
+  hit_file="${result_dir}/${prefix}.hit"
+
+  rm -f "${overlap_path}" "${hit_file}"
+
+  gatk IntervalListTools \
+    -I "${interval_path}" \
+    -SI "${GENE_INTERVAL_LIST}" \
+    --ACTION OVERLAPS \
+    -O "${overlap_path}" \
+    --QUIET true
+
+  if LC_ALL=C grep -q -m1 '^[^@]' "${overlap_path}"; then
+    printf '%s\n' "${interval_path}" > "${hit_file}"
   fi
 }
 
+[[ -f "${GENE_INTERVAL_LIST}" ]] || die "Missing gene interval list at ${GENE_INTERVAL_LIST}"
+[[ -d "${INTERVAL_LIST_DIR}" ]] || die "Missing interval list directory at ${INTERVAL_LIST_DIR}"
+command -v gatk >/dev/null 2>&1 || die "gatk not found in PATH"
 
-# Build a list of shards that still need processing and download them in bulk
-bulk_dir=$(mktemp -d "${TMP_DIR}/vcf_bulk.XXXXXX")
-download_list_file="${DOWNLOAD_LIST_PATH}"
-to_process_prefixes=()
-
-# Always derive prefixes from the persistent download list
-if [[ -f "${download_list_file}" ]]; then
-  echo "Using download list at ${download_list_file}."
-  mapfile -t to_process_prefixes < <(awk '{print $0}' "${download_list_file}" | sed -E 's#.*/([^/]+)\.vcf\.bgz(\.tbi)?$#\1#' | grep -E '^[0-9]+' | sort -u)
-else
-  echo "Download list not found at ${download_list_file}. Interval screening should have created it." >&2
-  rm -rf "${bulk_dir}"
-  exit 1
+if [[ -z "${MAX_JOBS}" ]]; then
+  MAX_JOBS=$(detect_default_jobs)
+fi
+case "${MAX_JOBS}" in
+  ''|*[!0-9]*)
+    die "MAX_JOBS must be a positive integer (received '${MAX_JOBS}')"
+    ;;
+esac
+if (( MAX_JOBS < 1 )); then
+  MAX_JOBS=1
 fi
 
-# Check if any outputs are already completed and skip them
-completed_prefixes=()
-for prefix in "${to_process_prefixes[@]}"; do
-  output_file="${OUTPUT_DIR}/${prefix}_filtered.vcf.bgz"
-  output_tbi="${output_file}.tbi"
-  
-  if [[ -f "${output_file}" && -f "${output_tbi}" ]]; then
-    echo "Skipping shard ${prefix}: already processed."
-    skipped=$((skipped + 1))
-    completed_prefixes+=("${prefix}")
-  fi
-done
+mkdir -p "${OUTPUT_DIR}" "${TMP_DIR}"
 
-# Remove completed prefixes from the processing list
-for completed in "${completed_prefixes[@]}"; do
-  to_process_prefixes=("${to_process_prefixes[@]/$completed}")
-done
+if [[ -d "${INTERMEDIATE_DIR}" ]]; then
+  find "${INTERMEDIATE_DIR}" -type f -name '*.interval_list' -delete
+else
+  mkdir -p "${INTERMEDIATE_DIR}"
+fi
 
-if (( ${#to_process_prefixes[@]} == 0 )); then
-  echo "Nothing new to process; all shard(s) already completed."
-  rm -rf "${bulk_dir}"
-  avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-  avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
-  echo "Completed: ${processed} shard(s); skipped ${skipped}."
-  echo "Average copy time (processed shards): ${avg_copy}s"
-  echo "Average filter time (processed shards): ${avg_filter}s"
+> "${DOWNLOAD_LIST}"
+> "${INTERVAL_LISTS_WITH_OVERLAP}"
+
+interval_files=()
+while IFS= read -r path; do
+  interval_files+=("${path}")
+done < <(find "${INTERVAL_LIST_DIR}" -type f -name '*.interval_list' -print | sort)
+
+if (( ${#interval_files[@]} == 0 )); then
+  echo "No interval_list files found under ${INTERVAL_LIST_DIR}; nothing to do."
   exit 0
 fi
 
-echo "Bulk downloading ${#to_process_prefixes[@]} shard(s) to ${bulk_dir} using parallel gsutil..."
-copy_start=$(date +%s)
-gsutil -u "${GOOGLE_PROJECT}" -m \
-  -o "GSUtil:parallel_thread_count=${GSUTIL_THREADS}" \
-  -o "GSUtil:parallel_process_count=1" \
-  cp -I "${bulk_dir}/" < "${download_list_file}"
-copy_end=$(date +%s)
-copy_time_total=$((copy_time_total + (copy_end - copy_start)))
+if (( MAX_JOBS > ${#interval_files[@]} )); then
+  MAX_JOBS=${#interval_files[@]}
+fi
 
-# Process downloaded VCFs in batches with parallelization
-PROCESS_BATCH_SIZE=30
-MAX_PARALLEL_BATCHES=8  # Number of batches to process in parallel
-total_prefixes=${#to_process_prefixes[@]}
-batch_count=0
+RESULTS_DIR=$(mktemp -d "${TMP_DIR}/interval_overlap.XXXXXX")
 
-# Function to process a single batch
-process_batch() {
-  local batch_num=$1
-  local start_idx=$2
-  local end_idx=$3
-  local batch_prefixes=("${@:4}")
-  
-  echo "Processing batch ${batch_num}: ${#batch_prefixes[@]} files (${start_idx}-${end_idx} of ${total_prefixes})"
-  
-  # Create list of VCF files for this batch
-  batch_vcf_list=$(mktemp "${TMP_DIR}/batch_vcfs.${batch_num}.XXXXXX.txt")
-  for prefix in "${batch_prefixes[@]}"; do
-    local_vcf="${bulk_dir}/${prefix}.vcf.bgz"
-    if [[ -f "${local_vcf}" ]]; then
-      echo "${local_vcf}" >> "${batch_vcf_list}"
-    else
-      echo "Warning: missing ${local_vcf}; skipping from batch ${batch_num}." >&2
-    fi
-  done
-  
-  # Check if we have any files in this batch
-  if [[ ! -s "${batch_vcf_list}" ]]; then
-    echo "No valid files in batch ${batch_num}; skipping."
-    rm -f "${batch_vcf_list}"
-    return
-  fi
-  
-  # Concat the batch (faster than merge for same samples)
-  concat_vcf="${OUTPUT_DIR}/batched_vcfs/batch_${batch_num}.vcf.bgz"
-  mkdir -p "${OUTPUT_DIR}/batched_vcfs"
-  echo "Concatenating ${#batch_prefixes[@]} VCF files for batch ${batch_num}..."
-  bcftools concat -f "${batch_vcf_list}" -Oz -o "${concat_vcf}"
-  tabix -p vcf "${concat_vcf}"
-  rm -f "${batch_vcf_list}"
-  
-  # Annotate and filter the concatenated file
-  : '
-  # This doesnt work and idk why. 2.5 does the same thing but it works.
-  bc_start=$(date +%s)
-    bcftools annotate \
-      -a "${CLINVAR_ANNOTATION}" \
-      -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
-      -k \
-      -Ou "${concat_vcf}" | \
-    bcftools view \
-      -i "${FILTER_EXPR}" \
-      -Oz -o "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
-    tabix -p vcf "${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
-    bc_end=$(date +%s)
-  '
-  
-  
-  echo "Filtered batch ${batch_num}: ${#batch_prefixes[@]} files to ${OUTPUT_DIR}/batch_${batch_num}_filtered.vcf.bgz"
-  echo "Batched VCF saved to: ${concat_vcf}"
-}
+fifo_path=$(mktemp "${TMP_DIR}/interval_sem.XXXXXX")
+rm -f "${fifo_path}"
+mkfifo "${fifo_path}"
+exec 9<>"${fifo_path}"
+rm -f "${fifo_path}"
+fifo_fd_open=1
 
-# Process batches in parallel
-for (( i=0; i<total_prefixes; i+=PROCESS_BATCH_SIZE )); do
-  batch_count=$((batch_count + 1))
-  batch_end=$((i + PROCESS_BATCH_SIZE))
-  if (( batch_end > total_prefixes )); then
-    batch_end=${total_prefixes}
-  fi
-  
-  batch_prefixes=("${to_process_prefixes[@]:i:batch_end-i}")
-  
-  # Start batch processing in background
-  process_batch "${batch_count}" "${i}" "${batch_end}" "${batch_prefixes[@]}" &
-  
-  # Limit number of parallel jobs
-  if (( batch_count % MAX_PARALLEL_BATCHES == 0 )); then
-    wait  # Wait for all background jobs to complete
-  fi
+job=0
+total=${#interval_files[@]}
+pids=()
+
+while (( job < MAX_JOBS )); do
+  printf 'token\n' >&9
+  job=$((job + 1))
 done
 
-# Wait for any remaining background jobs
-wait
+index=0
+for interval_path in "${interval_files[@]}"; do
+  read -r _ <&9
+  index=$((index + 1))
+  echo "[${index}/${total}] Scheduling $(basename "${interval_path}")"
+  {
+    run_overlap "${interval_path}" "${RESULTS_DIR}"
+    printf 'token\n' >&9
+  } &
+  pids+=("$!")
+done
 
-# Clean up all bulk-downloaded files
-rm -rf "${bulk_dir}"
+set +e
+failures=0
+for pid in "${pids[@]}"; do
+  if ! wait "${pid}"; then
+    failures=$((failures + 1))
+  fi
+done
+set -e
 
-#avg_copy=$(format_avg "$copy_time_total" "$processed_with_times")
-#avg_filter=$(format_avg "$filter_time_total" "$processed_with_times")
+exec 9>&-
+exec 9<&-
+fifo_fd_open=0
 
-echo "Completed: ${processed}/${total} shard(s); skipped ${skipped}."
-#echo "Average copy time (processed shards): ${avg_copy}s"
-#echo "Average filter time (processed shards): ${avg_filter}s"
+if (( failures > 0 )); then
+  die "${failures} overlap job(s) failed"
+fi
+
+overlapping_paths=()
+while IFS= read -r -d '' hit_file; do
+  while IFS= read -r path; do
+    if [[ -n "${path}" ]]; then
+      overlapping_paths+=("${path}")
+    fi
+  done < "${hit_file}"
+done < <(find "${RESULTS_DIR}" -type f -name '*.hit' -print0)
+
+if (( ${#overlapping_paths[@]} == 0 )); then
+  echo "No overlaps detected across ${total} interval list(s)."
+  exit 0
+fi
+
+unique_tmp=$(mktemp "${TMP_DIR}/interval_hits_unique.XXXXXX")
+printf '%s\n' "${overlapping_paths[@]}" | sort -u > "${unique_tmp}"
+
+unique_paths=()
+while IFS= read -r path; do
+  if [[ -n "${path}" ]]; then
+    unique_paths+=("${path}")
+  fi
+done < "${unique_tmp}"
+rm -f "${unique_tmp}"
+
+remote_base="${REMOTE_VCF_BASE%/}"
+[[ -n "${remote_base}" ]] || die "REMOTE_VCF_BASE must not be empty"
+
+> "${DOWNLOAD_LIST}"
+> "${INTERVAL_LISTS_WITH_OVERLAP}"
+
+for path in "${unique_paths[@]}"; do
+  base=$(basename "${path}")
+  prefix="${base%.interval_list}"
+  printf '%s/%s.vcf.bgz\n' "${remote_base}" "${prefix}" >> "${DOWNLOAD_LIST}"
+  printf '%s/%s.vcf.bgz.tbi\n' "${remote_base}" "${prefix}" >> "${DOWNLOAD_LIST}"
+  printf '%s\n' "${path}" >> "${INTERVAL_LISTS_WITH_OVERLAP}"
+done
+
+echo "Identified ${#unique_paths[@]} interval list(s) with overlaps."
+echo "Wrote VCF download list to ${DOWNLOAD_LIST}."
+echo "Wrote matching interval list paths to ${INTERVAL_LISTS_WITH_OVERLAP}."
