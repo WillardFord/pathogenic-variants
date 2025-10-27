@@ -11,7 +11,7 @@ gs_base="gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/clinvar/vcf"
 output_file="output/vcf_download_list.txt"
 echo -n > "${output_file}"
 
-interval_list_dir="output/interval_lists"
+interval_list_dir="output/interval_lists_with_overlapping_ranges"
 
 # Read file list into array to avoid glob expansion issues
 mapfile -t files < <(ls "${interval_list_dir}"/*.interval_list 2>/dev/null)
