@@ -1,10 +1,10 @@
 # For some reason the scripts don't work with BCF tool filtering.
 # So just copy and paste below:
 :'
-JOBS=${JOBS:-8}
+JOBS=${JOBS:-16}
 BCFTOOLS_THREADS_PER_JOB=${BCFTOOLS_THREADS_PER_JOB:-2}
-INPUT_DIR="output/gene_filtered/annotated_vcfs/"
-OUTPUT_DIR="output/gene_filtered/filtered_pathogenic_vcfs"
+INPUT_DIR="output/annotated_vcfs_with_overlapping_ranges"
+OUTPUT_DIR="output/filtered_vcfs_with_overlapping_ranges"
 
 mkdir -p "${OUTPUT_DIR}"
 
