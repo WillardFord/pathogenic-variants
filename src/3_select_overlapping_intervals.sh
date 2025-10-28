@@ -18,7 +18,7 @@ mapfile -t files < <(ls "${interval_list_dir}"/*.interval_list 2>/dev/null)
 
 
 for file in "${files[@]}"; do
-  if grep -q "^chr" "$file"; then
+  if grep -m 1 -q "^chr" "$file"; then
     echo "${gs_base}/${file%.interval_list}.vcf.bgz" >> "${output_file}"
   fi
 done
