@@ -8,12 +8,13 @@ directly without command-line arguments.
 
 from __future__ import annotations
 
-import os
 import math
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 
 import polars as pl
+import pyarrow.parquet as pq
 from cyvcf2 import VCF
 
 
@@ -33,6 +34,29 @@ VARIANT_INFO_SPECS: Dict[str, Tuple[Any, bool, str]] = {
     "AS_QUALapprox": (0, True, "int"),
     "SCORE": (0.0, True, "float"),
 }
+
+
+def positive_int_from_env(name: str, default: int) -> int:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a positive integer (got {value!r})") from exc
+    if parsed <= 0:
+        raise ValueError(f"{name} must be greater than zero (got {parsed})")
+    return parsed
+
+
+VCF_THREADS = positive_int_from_env("VCF_TO_PARQUET_VCF_THREADS", 16)
+RECORDS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_RECORDS_PER_CHUNK", 100)
+VARIANT_ROWS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_VARIANT_ROWS_PER_CHUNK", 2000)
+SAMPLE_ROWS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_SAMPLE_ROWS_PER_CHUNK", 50_000)
+PARQUET_THREADS = positive_int_from_env("VCF_TO_PARQUET_PARQUET_THREADS", 16)
+
+os.environ.setdefault("PYARROW_NUM_THREADS", str(PARQUET_THREADS))
+os.environ.setdefault("POLARS_MAX_THREADS", str(PARQUET_THREADS))
 
 
 def ensure_parent(path: Path) -> None:
@@ -141,16 +165,86 @@ def scalar_value(array, index: int, default: Any, kind: str = "int") -> Any:
         return default
 
 
-def prepare_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    variant_rows: list[dict[str, Any]] = []
-    sample_rows: list[dict[str, Any]] = []
+def empty_variant_df() -> pl.DataFrame:
+    return pl.DataFrame(
+        {
+            "chrom": pl.Series("chrom", [], dtype=pl.Utf8),
+            "pos": pl.Series("pos", [], dtype=pl.Int64),
+            "ref": pl.Series("ref", [], dtype=pl.Utf8),
+            "alt": pl.Series("alt", [], dtype=pl.Utf8),
+            "CLNSIG": pl.Series("CLNSIG", [], dtype=pl.Utf8),
+            "GENEINFO": pl.Series("GENEINFO", [], dtype=pl.Utf8),
+            "MC": pl.Series("MC", [], dtype=pl.Utf8),
+            "AF": pl.Series("AF", [], dtype=pl.Float64),
+            "AN": pl.Series("AN", [], dtype=pl.Int64),
+            "AC": pl.Series("AC", [], dtype=pl.Int64),
+            "QUALapprox": pl.Series("QUALapprox", [], dtype=pl.Int64),
+            "AS_QUALapprox": pl.Series("AS_QUALapprox", [], dtype=pl.Int64),
+            "SCORE": pl.Series("SCORE", [], dtype=pl.Float64),
+        }
+    )
+
+
+def empty_sample_df() -> pl.DataFrame:
+    return pl.DataFrame(
+        {
+            "chrom": pl.Series("chrom", [], dtype=pl.Utf8),
+            "pos": pl.Series("pos", [], dtype=pl.Int64),
+            "ref": pl.Series("ref", [], dtype=pl.Utf8),
+            "alts": pl.Series("alts", [], dtype=pl.Utf8),
+            "sample": pl.Series("sample", [], dtype=pl.Utf8),
+            "gt": pl.Series("gt", [], dtype=pl.Utf8),
+            "ad": pl.Series("ad", [], dtype=pl.List(pl.Int64)),
+            "gq": pl.Series("gq", [], dtype=pl.Int64),
+            "ps": pl.Series("ps", [], dtype=pl.Int64),
+            "rgq": pl.Series("rgq", [], dtype=pl.Int64),
+            "ft": pl.Series("ft", [], dtype=pl.Utf8),
+        }
+    )
+
+
+class ParquetStreamWriter:
+    def __init__(self, path: Path, empty_frame_factory) -> None:
+        self._path = path
+        self._writer: pq.ParquetWriter | None = None
+        self._empty_frame_factory = empty_frame_factory
+        ensure_parent(path)
+
+    def write(self, rows: list[dict[str, Any]]) -> None:
+        if not rows:
+            return
+        df = pl.DataFrame(rows)
+        if df.is_empty():
+            return
+        table = df.to_arrow()
+        if self._writer is None:
+            self._writer = pq.ParquetWriter(self._path, table.schema, compression="zstd")
+        self._writer.write_table(table)
+
+    def close(self) -> None:
+        if self._writer is not None:
+            self._writer.close()
+            self._writer = None
+        else:
+            empty_df = self._empty_frame_factory()
+            empty_df.write_parquet(self._path, compression="zstd")
+
+
+def iter_vcf_batches() -> Iterable[tuple[list[dict[str, Any]], list[dict[str, Any]]]]:
     vcf = VCF(str(VCF_PATH))
+    vcf.set_threads(VCF_THREADS)
     samples = vcf.samples
+    variant_batch: list[dict[str, Any]] = []
+    sample_batch: list[dict[str, Any]] = []
+    record_counter = 0
+
     try:
         for record in vcf:
             alt_count = len(record.ALT)
             if alt_count == 0:
                 continue
+
+            record_counter += 1
 
             for alt_index, alt in enumerate(record.ALT):
                 row: dict[str, Any] = {
@@ -167,7 +261,7 @@ def prepare_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
                         default,
                     )
                     row[key] = cast_value(value, kind, default)
-                variant_rows.append(row)
+                variant_batch.append(row)
 
             genotypes = record.genotypes
             ad_array = record.format("AD")
@@ -186,7 +280,7 @@ def prepare_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
                 rgq_value = scalar_value(rgq_array, idx, 0, "int")
                 ft_value = scalar_value(ft_array, idx, "", "str")
 
-                sample_rows.append(
+                sample_batch.append(
                     {
                         "chrom": record.CHROM,
                         "pos": record.POS,
@@ -201,24 +295,38 @@ def prepare_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
                         "ft": ft_value,
                     }
                 )
+
+            should_flush = False
+            if RECORDS_PER_CHUNK and record_counter % RECORDS_PER_CHUNK == 0:
+                should_flush = True
+            if len(variant_batch) >= VARIANT_ROWS_PER_CHUNK:
+                should_flush = True
+            if len(sample_batch) >= SAMPLE_ROWS_PER_CHUNK:
+                should_flush = True
+
+            if should_flush:
+                yield variant_batch, sample_batch
+                variant_batch, sample_batch = [], []
+
+        if variant_batch or sample_batch:
+            yield variant_batch, sample_batch
     finally:
         vcf.close()
-    return variant_rows, sample_rows
-
-
-def write_parquet(rows: list[dict[str, Any]], path: Path) -> None:
-    if not rows:
-        df = pl.DataFrame()
-    else:
-        df = pl.DataFrame(rows)
-    ensure_parent(path)
-    df.write_parquet(path, compression="zstd")
 
 
 def main() -> None:
-    variant_rows, sample_rows = prepare_rows()
-    write_parquet(variant_rows, VARIANT_PARQUET_PATH)
-    write_parquet(sample_rows, SAMPLE_PARQUET_PATH)
+    variant_writer = ParquetStreamWriter(VARIANT_PARQUET_PATH, empty_variant_df)
+    sample_writer = ParquetStreamWriter(SAMPLE_PARQUET_PATH, empty_sample_df)
+
+    try:
+        for variant_rows, sample_rows in iter_vcf_batches():
+            variant_writer.write(variant_rows)
+            sample_writer.write(sample_rows)
+            variant_rows.clear()
+            sample_rows.clear()
+    finally:
+        variant_writer.close()
+        sample_writer.close()
 
 
 if __name__ == "__main__":
