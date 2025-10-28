@@ -15,7 +15,7 @@ from cyvcf2 import VCF
 
 
 # Edit these constants to point at the desired inputs/outputs.
-VCF_PATH = Path("output/gene_filtered/filtered_pathogenic_vcfs/combined.vcf.gz")
+VCF_PATH = Path("output/combined_filtered.vcf.bgz")
 OUTPUT_PATH = Path("output/prevalence/by_variant.tsv")
 
 
@@ -57,26 +57,24 @@ def prevalence_rows(vcf_path: Path) -> Iterator[Row]:
 
             for offset, alt in enumerate(record.ALT):
                 carrier_count = carriers[offset]
-                carrier_pct_total = (
-                    (carrier_count / total_samples) * 100 if total_samples else 0.0
+                total_samples = (
+                    total_samples
                 )
-                carrier_pct_called = (
-                    (carrier_count / called_samples) * 100 if called_samples else 0.0
+                # Called samples should be identical to total samples
+                called_samples = (
+                    called_samples
                 )
                 allele_count = alt_copies[offset]
-                allele_frequency = (
-                    (allele_count / total_alleles) if total_alleles else 0.0
-                )
+                # TODO fix below
                 yield [
                     record.CHROM,
                     record.POS,
                     record.REF,
                     alt,
                     carrier_count,
-                    carrier_pct_total,
-                    carrier_pct_called,
+                    total_samples,
+                    called_samples,
                     allele_count,
-                    allele_frequency,
                 ]
     finally:
         vcf.close()
@@ -89,10 +87,9 @@ def write_rows(rows: Iterator[Row], output_path: Path) -> None:
         "ref",
         "alt",
         "carrier_count",
-        "carrier_pct_total",
-        "carrier_pct_called",
+        "total_samples",
+        "called_samples",
         "allele_count",
-        "allele_frequency",
     ]
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="") as handle:
