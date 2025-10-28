@@ -1,15 +1,21 @@
 """
-Export variant-level attributes and per-sample genotype metrics from a VCF into
-compressed Parquet tables.
+Export variant-level attributes and per-sample genotype metrics from VCF shards.
 
-Paths and column requirements are hard-coded so the script can be executed
-directly without command-line arguments.
+When annotated shard files exist under
+``output/filtered_vcfs_with_overlapping_ranges/``, each file is converted in
+parallel into separate Parquet pieces beneath
+``output/prevalence/parquet/{variants,samples}``. If no shards are found, the
+script falls back to the combined VCF at ``output/combined.vcf.bgz`` and writes
+single Parquet tables for variants and samples. Paths and column requirements
+remain hard-coded so the script can be executed without command-line arguments.
 """
 
 from __future__ import annotations
 
 import math
 import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
@@ -21,6 +27,9 @@ from cyvcf2 import VCF
 VCF_PATH = Path("output/combined.vcf.bgz")
 VARIANT_PARQUET_PATH = Path("output/prevalence/variants.parquet")
 SAMPLE_PARQUET_PATH = Path("output/prevalence/samples.parquet")
+ANNOTATED_VCF_DIR = Path("output/filtered_vcfs_with_overlapping_ranges")
+VARIANT_DATASET_DIR = Path("output/prevalence/parquet/variants")
+SAMPLE_DATASET_DIR = Path("output/prevalence/parquet/samples")
 
 
 VARIANT_INFO_SPECS: Dict[str, Tuple[Any, bool, str]] = {
@@ -49,14 +58,64 @@ def positive_int_from_env(name: str, default: int) -> int:
     return parsed
 
 
-VCF_THREADS = positive_int_from_env("VCF_TO_PARQUET_VCF_THREADS", 16)
-RECORDS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_RECORDS_PER_CHUNK", 100)
-VARIANT_ROWS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_VARIANT_ROWS_PER_CHUNK", 2000)
-SAMPLE_ROWS_PER_CHUNK = positive_int_from_env("VCF_TO_PARQUET_SAMPLE_ROWS_PER_CHUNK", 50_000)
-PARQUET_THREADS = positive_int_from_env("VCF_TO_PARQUET_PARQUET_THREADS", 16)
+def bool_from_env(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be a truthy/falsey string (got {value!r})")
 
-os.environ.setdefault("PYARROW_NUM_THREADS", str(PARQUET_THREADS))
-os.environ.setdefault("POLARS_MAX_THREADS", str(PARQUET_THREADS))
+
+@dataclass
+class ConversionConfig:
+    vcf_threads: int
+    records_per_chunk: int
+    variant_rows_per_chunk: int
+    sample_rows_per_chunk: int
+    parquet_threads: int
+
+
+def build_config_from_env() -> ConversionConfig:
+    config = ConversionConfig(
+        vcf_threads=positive_int_from_env("VCF_TO_PARQUET_VCF_THREADS", 16),
+        records_per_chunk=positive_int_from_env("VCF_TO_PARQUET_RECORDS_PER_CHUNK", 100),
+        variant_rows_per_chunk=positive_int_from_env("VCF_TO_PARQUET_VARIANT_ROWS_PER_CHUNK", 2000),
+        sample_rows_per_chunk=positive_int_from_env("VCF_TO_PARQUET_SAMPLE_ROWS_PER_CHUNK", 50_000),
+        parquet_threads=positive_int_from_env("VCF_TO_PARQUET_PARQUET_THREADS", 16),
+    )
+    return config
+
+
+def configure_thread_env(config: ConversionConfig) -> None:
+    os.environ.setdefault("PYARROW_NUM_THREADS", str(config.parquet_threads))
+    os.environ.setdefault("POLARS_MAX_THREADS", str(config.parquet_threads))
+
+
+def strip_known_suffixes(name: str) -> str:
+    lowercase = name.lower()
+    for suffix in (".vcf.bgz", ".vcf.gz", ".bgz", ".gz", ".vcf"):
+        if lowercase.endswith(suffix):
+            return name[: -len(suffix)]
+    return Path(name).stem
+
+
+def dataset_output_paths(vcf_path: Path) -> tuple[Path, Path]:
+    base = strip_known_suffixes(vcf_path.name)
+    variant_path = VARIANT_DATASET_DIR / f"{base}.parquet"
+    sample_path = SAMPLE_DATASET_DIR / f"{base}.parquet"
+    return variant_path, sample_path
+
+
+def find_annotated_vcfs(directory: Path) -> List[Path]:
+    if not directory.is_dir():
+        return []
+    candidates = set(directory.glob("*_annotated.vcf.bgz"))
+    candidates.update(directory.glob("*_annotated.vcf.gz"))
+    return sorted(candidates)
 
 
 def ensure_parent(path: Path) -> None:
@@ -230,9 +289,9 @@ class ParquetStreamWriter:
             empty_df.write_parquet(self._path, compression="zstd")
 
 
-def iter_vcf_batches() -> Iterable[tuple[list[dict[str, Any]], list[dict[str, Any]]]]:
-    vcf = VCF(str(VCF_PATH))
-    vcf.set_threads(VCF_THREADS)
+def iter_vcf_batches(vcf_path: Path, config: ConversionConfig) -> Iterable[tuple[list[dict[str, Any]], list[dict[str, Any]]]]:
+    vcf = VCF(str(vcf_path))
+    vcf.set_threads(config.vcf_threads)
     samples = vcf.samples
     variant_batch: list[dict[str, Any]] = []
     sample_batch: list[dict[str, Any]] = []
@@ -297,11 +356,11 @@ def iter_vcf_batches() -> Iterable[tuple[list[dict[str, Any]], list[dict[str, An
                 )
 
             should_flush = False
-            if RECORDS_PER_CHUNK and record_counter % RECORDS_PER_CHUNK == 0:
+            if config.records_per_chunk and record_counter % config.records_per_chunk == 0:
                 should_flush = True
-            if len(variant_batch) >= VARIANT_ROWS_PER_CHUNK:
+            if len(variant_batch) >= config.variant_rows_per_chunk:
                 should_flush = True
-            if len(sample_batch) >= SAMPLE_ROWS_PER_CHUNK:
+            if len(sample_batch) >= config.sample_rows_per_chunk:
                 should_flush = True
 
             if should_flush:
@@ -314,19 +373,104 @@ def iter_vcf_batches() -> Iterable[tuple[list[dict[str, Any]], list[dict[str, An
         vcf.close()
 
 
-def main() -> None:
-    variant_writer = ParquetStreamWriter(VARIANT_PARQUET_PATH, empty_variant_df)
-    sample_writer = ParquetStreamWriter(SAMPLE_PARQUET_PATH, empty_sample_df)
+def convert_vcf_to_parquet(
+    vcf_path: Path,
+    variant_path: Path,
+    sample_path: Path,
+    config: ConversionConfig | None = None,
+    force: bool = False,
+) -> None:
+    if config is None:
+        config = build_config_from_env()
+    configure_thread_env(config)
+
+    if not force and variant_path.exists() and sample_path.exists():
+        print(f"[SKIP] {vcf_path.name}: outputs already exist.", flush=True)
+        return
+
+    print(f"[CONVERT] {vcf_path.name} -> {variant_path.name}", flush=True)
+
+    variant_writer = ParquetStreamWriter(variant_path, empty_variant_df)
+    sample_writer = ParquetStreamWriter(sample_path, empty_sample_df)
 
     try:
-        for variant_rows, sample_rows in iter_vcf_batches():
+        for variant_rows, sample_rows in iter_vcf_batches(vcf_path, config):
             variant_writer.write(variant_rows)
             sample_writer.write(sample_rows)
-            variant_rows.clear()
-            sample_rows.clear()
     finally:
         variant_writer.close()
         sample_writer.close()
+
+    print(f"[DONE] {vcf_path.name}", flush=True)
+
+
+def _convert_worker(
+    vcf_path: str,
+    variant_path: str,
+    sample_path: str,
+    config: ConversionConfig,
+    force: bool,
+) -> str:
+    convert_vcf_to_parquet(
+        Path(vcf_path),
+        Path(variant_path),
+        Path(sample_path),
+        config=config,
+        force=force,
+    )
+    return vcf_path
+
+
+def main() -> None:
+    config = build_config_from_env()
+    force = bool_from_env("VCF_TO_PARQUET_FORCE", False)
+    default_procs = max(os.cpu_count() or 1, 1)
+    max_processes = positive_int_from_env("VCF_TO_PARQUET_MAX_PROCESSES", default_procs)
+
+    annotated_vcfs = find_annotated_vcfs(ANNOTATED_VCF_DIR)
+
+    if annotated_vcfs:
+        VARIANT_DATASET_DIR.mkdir(parents=True, exist_ok=True)
+        SAMPLE_DATASET_DIR.mkdir(parents=True, exist_ok=True)
+
+        pending = []
+        for vcf_path in annotated_vcfs:
+            variant_path, sample_path = dataset_output_paths(vcf_path)
+            if not force and variant_path.exists() and sample_path.exists():
+                print(f"[SKIP] {vcf_path.name}: outputs already exist.")
+                continue
+            pending.append((vcf_path, variant_path, sample_path))
+
+        if not pending:
+            print("All annotated VCFs already converted; nothing to do.")
+            return
+
+        worker_count = min(len(pending), max_processes)
+        print(f"Converting {len(pending)} VCF shard(s) with {worker_count} process(es)...")
+
+        with ProcessPoolExecutor(max_workers=worker_count) as pool:
+            futures = [
+                pool.submit(
+                    _convert_worker,
+                    str(vcf_path),
+                    str(variant_path),
+                    str(sample_path),
+                    config,
+                    force,
+                )
+                for vcf_path, variant_path, sample_path in pending
+            ]
+            for future in as_completed(futures):
+                future.result()
+        return
+
+    convert_vcf_to_parquet(
+        VCF_PATH,
+        VARIANT_PARQUET_PATH,
+        SAMPLE_PARQUET_PATH,
+        config=config,
+        force=force,
+    )
 
 
 if __name__ == "__main__":

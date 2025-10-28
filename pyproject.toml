@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "cyvcf2>=0.31.4",
+    "dataclasses>=0.8",
     "marimo>=0.15.5",
     "polars>=1.33.1",
     "pyarrow>=22.0.0",
