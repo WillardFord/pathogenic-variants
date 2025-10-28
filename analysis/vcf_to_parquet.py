@@ -17,7 +17,7 @@ import polars as pl
 from cyvcf2 import VCF
 
 
-VCF_PATH = Path("output/combined.vcf.gz")
+VCF_PATH = Path("output/combined.vcf.bgz")
 VARIANT_PARQUET_PATH = Path("output/prevalence/variants.parquet")
 SAMPLE_PARQUET_PATH = Path("output/prevalence/samples.parquet")
 
