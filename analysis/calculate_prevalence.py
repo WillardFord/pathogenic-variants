@@ -15,8 +15,8 @@ from cyvcf2 import VCF
 
 
 # Edit these constants to point at the desired inputs/outputs.
-VCF_PATH = Path("output/combined_filtered.vcf.bgz")
-OUTPUT_PATH = Path("output/prevalence/by_variant.tsv")
+VCF_PATH = Path("output/combined.vcf.bgz")
+OUTPUT_PATH = Path("output/prevalence/prevalence_by_variant.tsv")
 
 
 Row = Sequence[object]
