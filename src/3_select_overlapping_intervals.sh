@@ -19,7 +19,10 @@ mapfile -t files < <(ls "${interval_list_dir}"/*.interval_list 2>/dev/null)
 
 for file in "${files[@]}"; do
   if grep -m 1 -q "^chr" "$file"; then
-    echo "${gs_base}/${file%.interval_list}.vcf.bgz" >> "${output_file}"
+    base=$(basename "$file")
+    vcf="${gs_base}/${base%.interval_list}.vcf.bgz"
+    echo "${vcf}" >> "${output_file}"
+    echo "${vcf}.tbi" >> "${output_file}"
   fi
 done
 

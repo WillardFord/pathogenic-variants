@@ -14,11 +14,11 @@
 # It works fine. What is the difference?
 # bcftools annotate -a data/clinvar_with_chr.vcf.gz -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC -k -Ou output/gene_filtered/batched_vcfs/batch_10.vcf.bgz
 :'Okay I gave up and just used the below command in terminal and it worked.
-JOBS=8
+JOBS=16
 n=0
-for f in output/gene_filtered/batched_vcfs/*.vcf.bgz; do
+for f in output/downloaded_vcfs_with_overlapping_ranges/*.vcf.bgz; do
   base=$(basename "$f")
-  out="output/gene_filtered/annotated_vcfs/$base"
+  out="output/annotated_vcfs_with_overlapping_ranges/${base%.vcf.bgz}_annotated.vcf.bgz"
   {
   bcftools annotate -a data/clinvar_with_chr.vcf.gz \
     -c INFO/CLNSIG,INFO/CLNSIGCONF,INFO/GENEINFO,INFO/MC \
