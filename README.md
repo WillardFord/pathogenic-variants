@@ -126,14 +126,18 @@ to
 ```
 This is 3 different ranges which is exactly what we wanted to see because we have 3 pathogenic genes on the x chromosome. And the last set of variants is exactly the lists that have ABCD1 which we lost. So this method will work.
 
-Let's output to output/vcfs_with_overlapping_ranges
-```
+So I repeated this whole process for all variants. 
 
-```
+Then I created parquet files from all vcf files to analyze in python using analysis/vcf_to_parquet.py
 
-## Do I actually believe that 50% of our individuals have a pathogenic variant?
+Then inside 
+
+
+
+## Do I actually believe that 80% of individuals have at least 1 pathogenic variant in at least 1 of the ACMG genes in our list?
 - Spot check individual cases, especially cases from each mode of inheritance.
 
+Turns out that any variant will get the same label at the same location because of the input method in AllOfUs that has all alternate alleles on a single line.
 
 ## Phenotyping
 Still have to do phenotyping of all of our individuals across all diseases which we can do, and for which we have genetic information
@@ -145,3 +149,8 @@ Phenotypic Analysis:
   - Phenotyping of relevant diseases
   - Ancestry
   - Covariates (age/sex/etc)
+
+## What about familes?
+Are certain prevalence? or prevalence w/o phenotype over represented within families?
+
+

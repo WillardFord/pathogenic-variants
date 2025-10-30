@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
-INPUT_DIR="${PROJECT_ROOT}/output/downloaded_vcfs_with_overlapping_ranges"
+INPUT_DIR="${PROJECT_ROOT}/output/flattened_vcfs_with_overlapping_ranges"
 OUTPUT_DIR="${PROJECT_ROOT}/output/annotated_vcfs_with_overlapping_ranges"
 ANNOTATION="${PROJECT_ROOT}/data/clinvar_with_chr.vcf.gz"
 ANNOTATION_TBI="${ANNOTATION}.tbi"
