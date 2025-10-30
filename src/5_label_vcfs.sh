@@ -7,7 +7,7 @@ INPUT_DIR="${PROJECT_ROOT}/output/flattened_vcfs_with_overlapping_ranges"
 OUTPUT_DIR="${PROJECT_ROOT}/output/annotated_vcfs_with_overlapping_ranges"
 ANNOTATION="${PROJECT_ROOT}/data/clinvar_with_chr.vcf.gz"
 ANNOTATION_TBI="${ANNOTATION}.tbi"
-JOBS=${JOBS:-16}
+JOBS=${JOBS:-8}
 BCFTOOLS_THREADS=${BCFTOOLS_THREADS:-2}
 
 if ! command -v bcftools >/dev/null 2>&1; then

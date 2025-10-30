@@ -7,8 +7,8 @@ INPUT_DIR="${PROJECT_ROOT}/output/annotated_vcfs_with_overlapping_ranges"
 OUTPUT_DIR="${PROJECT_ROOT}/output/filtered_vcfs_with_overlapping_ranges"
 GENE_LIST="${PROJECT_ROOT}/data/pathogenic_genes.txt"
 TMP_DIR="${PROJECT_ROOT}/tmp"
-JOBS=${JOBS:-16}
-BCFTOOLS_THREADS=${BCFTOOLS_THREADS:-1}
+JOBS=${JOBS:-2}
+BCFTOOLS_THREADS=${BCFTOOLS_THREADS:-2}
 CLNSIG_MATCH=${CLNSIG_MATCH:-'INFO/CLNSIG=="Pathogenic,Likely_pathogenic"'}
 COMBINED_OUTPUT="${OUTPUT_DIR}/combined_filtered.vcf.bgz"
 
