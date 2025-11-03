@@ -134,14 +134,31 @@ Then inside
 
 
 
-## Do I actually believe that 80% of individuals have at least 1 pathogenic variant in at least 1 of the ACMG genes in our list?
-- Spot check individual cases, especially cases from each mode of inheritance.
+## Remaining Questions
+- How many submitters do each pathogenic or likely pathogenic variant have in my set.
+- What is the penetrance rate?
+- What is the prevelance and penetrance by ancestry-related group
+  - Do these relationships tend to follow patterns based on the type of variant?
+  - Are there patterns in indvidual genes?
+- What about variants in the region of a gene that may not be explicitly labeled with this gene
+- Where are my missing genes?
+  - The CALM gene family and a few others.
 
-Turns out that any variant will get the same label at the same location because of the input method in AllOfUs that has all alternate alleles on a single line.
 
 ## Phenotyping
-Still have to do phenotyping of all of our individuals across all diseases which we can do, and for which we have genetic information
+- We have OMIM codes which we can convert to ORPHAcodes.
+  - Some of these are 1-1 but most are not
+- Then we have ORPHAcode 1-1 mappings to most SNOMED codes.
+- This is all done using [ORPHA bindings](https://mappings.orphacode.org) manually online and in spreadsheets
+Or
+- Use [convert-pheno](https://github.com/CNAG-Biomedical-Informatics/convert-pheno) which can go between OMIM and OMOP
+  - It's written in perl though. I've literally never used perl.
+- [This paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC10196319/) did OMIM > HPO > OMOP
+  - Did they do it manually or are there nice tools?
+Let's try convert-pheno 
 
+Then look for 2 instances of the same code for the same patient to call it a case.
+Then we can look at pathogenecity
 
 Phenotypic Analysis:
 2. Parse presence of pathogenic variant in each individual not by clinvar label but by acmg definition of pathogenic which is slightly different for some genes. Then We can do summary statistics questions
