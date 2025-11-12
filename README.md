@@ -157,6 +157,30 @@ Or
   - Did they do it manually or are there nice tools?
 Let's try convert-pheno 
 
+## Collect ancestry information:
+```
+gsutil -u $GOOGLE_PROJECT cp gs://fc-aou-datasets-controlled/v8/wgs/short_read/snpindel/aux/ancestry/ancestry_preds.tsv output/ancestry_preds.tsv
+```
+
+
+## Statistical Test:
+- I need to more clearly define what I am comparing. 
+- When is a statistical test valid if I very different case and control sizes?
+
+Statistical test of 
+- variants or 
+- individuals 
+Not sure what the difference is.
+
+The more you can reproduce known results, then we can be more excited about novel results.
+- If you generate a grouping. Are they really distinct?
+
+
+The do associations with every variant with every phenotype.
+Then:
+- Is there a small set of variants that explains the total association? 
+- Are there some variants that explain no association?
+
 Then look for 2 instances of the same code for the same patient to call it a case.
 Then we can look at pathogenecity
 
