@@ -1,0 +1,114 @@
+MONDO Disease Name	Gene Symbol	HGNC ID	MONDO Disease Name	MONDO ID	MOI	Gene-Disease Validity	Reportable as SF	MOI.1	ORPHAcode	snomed	direct_snomed
+adrenoleukodystrophy	ABCD1	HGNC:61	adrenoleukodystrophy	MONDO:0018544	XL	Definitive	Yes	X-linked recessive	43	65389002	['49692006']
+hypertrophic cardiomyopathy	ACTC1	HGNC:143	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	ACTC1	HGNC:143	dilated cardiomyopathy	MONDO:0005021	AD	Moderate	Yes	Autosomal dominant	217604	195021004	['195021004']
+telangiectasia, hereditary hemorrhagic, type 2	ACVRL1	HGNC:175	telangiectasia, hereditary hemorrhagic, type 2	MONDO:0010880	AD	Definitive	Yes	Autosomal dominant		21877004	
+classic or attenuated familial adenomatous polyposis	APC	HGNC:583	classic or attenuated familial adenomatous polyposis	MONDO:0021057	AD	Definitive	Yes	Autosomal dominant		72900001	
+hypercholesterolemia, autosomal dominant, type B	APOB	HGNC:603	hypercholesterolemia, autosomal dominant, type B	MONDO:0007751	AD	Definitive	Yes	Autosomal dominant		238081000	['238081000']
+Wilson disease	ATP7B	HGNC:870	Wilson disease	MONDO:0010200	AR	Definitive	Yes	Autosomal recessive	905	88518009	['88518009']
+myofibrillar myopathy	BAG3	HGNC:939	myofibrillar myopathy	MONDO:0018943	AD	Definitive	Yes	Autosomal dominant	593	699269005	['699269005']
+dilated cardiomyopathy	BAG3	HGNC:939	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+juvenile polyposis syndrome	BMPR1A	HGNC:1076	juvenile polyposis syndrome	MONDO:0017380	AD	Definitive	Yes	Autosomal dominant	2929	9273005	['9273005']
+BRCA1-related cancer predisposition	BRCA1	HGNC:1100	BRCA1-related cancer predisposition	MONDO:0700268	AD	Definitive	Yes	Autosomal dominant		718220008	
+Fanconi anemia, complementation group S	BRCA1	HGNC:1100	Fanconi anemia, complementation group S	MONDO:0054748	AR	Definitive	Yes	Autosomal recessive		30575002	
+Fanconi anemia complementation group D1	BRCA2	HGNC:1101	Fanconi anemia complementation group D1	MONDO:0011584	AR	Definitive	Yes	Autosomal recessive	319462	766707003	['766707003']
+BRCA2-related cancer predisposition	BRCA2	HGNC:1101	BRCA2-related cancer predisposition	MONDO:0700269	AD	Definitive	Yes	Autosomal dominant		718220008	
+biotinidase deficiency	BTD	HGNC:1122	biotinidase deficiency	MONDO:0009665	AR	Definitive	Yes	Autosomal recessive	79241	8808004	['8808004']
+malignant hyperthermia, susceptibility to, 5	CACNA1S	HGNC:1397	malignant hyperthermia, susceptibility to, 5	MONDO:0011163	AD	Moderate	Yes	Autosomal dominant		405501007	
+catecholaminergic polymorphic ventricular tachycardia	CALM1	HGNC:1442	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AD	Moderate	Yes	Autosomal dominant	3286	419671004	['419671004']
+long QT syndrome	CALM1	HGNC:1442	long QT syndrome	MONDO:0002442	AD	Definitive	Yes	Autosomal dominant		9651007	
+catecholaminergic polymorphic ventricular tachycardia	CALM2	HGNC:1445	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AD	Moderate	Yes	Autosomal dominant	3286	419671004	['419671004']
+long QT syndrome	CALM2	HGNC:1445	long QT syndrome	MONDO:0002442	AD	Definitive	Yes	Autosomal dominant		9651007	
+catecholaminergic polymorphic ventricular tachycardia	CALM3	HGNC:1449	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AD	Moderate	Yes	Autosomal dominant	3286	419671004	['419671004']
+long QT syndrome	CALM3	HGNC:1449	long QT syndrome	MONDO:0002442	AD	Definitive	Yes	Autosomal dominant		9651007	
+catecholaminergic polymorphic ventricular tachycardia	CASQ2	HGNC:1513	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AR	Definitive	Yes	Autosomal recessive	3286	419671004	['419671004']
+Ehlers-Danlos syndrome, vascular type	COL3A1	HGNC:2201	Ehlers-Danlos syndrome, vascular type	MONDO:0017314	AD	Definitive	Yes	Autosomal dominant	286	17025000	['17025000']
+cerebrotendinous xanthomatosis	CYP27A1	HGNC:2605	cerebrotendinous xanthomatosis	MONDO:0008948	AR	Definitive	Yes	Autosomal recessive	909	63246000	['63246000']
+arrhythmogenic right ventricular cardiomyopathy	DES	HGNC:2770	arrhythmogenic right ventricular cardiomyopathy	MONDO:0016587	AD	Moderate	Yes	Autosomal dominant	247	253528005	['281170005']
+dilated cardiomyopathy	DES	HGNC:2770	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+familial isolated arrhythmogenic right ventricular dysplasia	DSC2	HGNC:3036	familial isolated arrhythmogenic right ventricular dysplasia	MONDO:0016342	AD	Definitive	Yes	Autosomal dominant	217656	715865008	['715865008']
+arrhythmogenic right ventricular cardiomyopathy	DSG2	HGNC:3049	arrhythmogenic right ventricular cardiomyopathy	MONDO:0016587	AD	Definitive	Yes	Autosomal dominant	247	253528005	['281170005']
+arrhythmogenic cardiomyopathy with wooly hair and keratoderma	DSP	HGNC:3052	arrhythmogenic cardiomyopathy with wooly hair and keratoderma	MONDO:0011581	AD	Definitive	Yes	Autosomal dominant	65282	719835006	['719835006']
+telangiectasia, hereditary hemorrhagic, type 1	ENG	HGNC:3349	telangiectasia, hereditary hemorrhagic, type 1	MONDO:0008535	AD	Definitive	Yes	Autosomal dominant		21877004	
+Marfan syndrome	FBN1	HGNC:3603	Marfan syndrome	MONDO:0007947	AD	Definitive	Yes	Autosomal dominant	284963	19346006	['19346006']
+familial thoracic aortic aneurysm and aortic dissection	FBN1	HGNC:3603	familial thoracic aortic aneurysm and aortic dissection	MONDO:0019625	AD	Definitive	Yes	Autosomal dominant	91387	764965000	['45894003', '764965000']
+myofibrillar myopathy	FLNC	HGNC:3756	myofibrillar myopathy	MONDO:0018943	AD	Definitive	Yes	Autosomal dominant	593	699269005	['699269005']
+dilated cardiomyopathy	FLNC	HGNC:3756	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+glycogen storage disease II	GAA	HGNC:4065	glycogen storage disease II	MONDO:0009290	AR	Definitive	Yes	Autosomal recessive	365	274864009	['274864009']
+Fabry disease	GLA	HGNC:4296	Fabry disease	MONDO:0010526	XL	Definitive	Yes	X-linked recessive	324	16652001	['16652001']
+monogenic diabetes	HNF1A	HGNC:11621	monogenic diabetes	MONDO:0015967	AD	Definitive	Yes	Autosomal dominant	183625	609561005	
+long QT syndrome	KCNH2	HGNC:6251	long QT syndrome	MONDO:0002442	AD	Definitive	Yes	Autosomal dominant		9651007	
+short QT syndrome	KCNH2	HGNC:6251	short QT syndrome	MONDO:0000453	AD	Definitive	Yes	Autosomal dominant	51083	698272007	['698272007']
+Jervell and Lange-Nielsen syndrome	KCNQ1	HGNC:6294	Jervell and Lange-Nielsen syndrome	MONDO:0002441	AR	Definitive	Yes	Autosomal recessive	90647	373905003	['373905003']
+short QT syndrome	KCNQ1	HGNC:6294	short QT syndrome	MONDO:0000453	AD	Strong	Yes	Autosomal dominant	51083	698272007	['698272007']
+long QT syndrome	KCNQ1	HGNC:6294	long QT syndrome	MONDO:0002442	AD	Definitive	Yes	Autosomal dominant		9651007	
+hypercholesterolemia, familial, 1	LDLR	HGNC:6547	hypercholesterolemia, familial, 1	MONDO:0007750	SD	Definitive	Yes	Autosomal dominant		398036000	['398036000']
+dilated cardiomyopathy	LMNA	HGNC:6636	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+hereditary pheochromocytoma-paraganglioma	MAX	HGNC:6913	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+multiple endocrine neoplasia type 1	MEN1	HGNC:7010	multiple endocrine neoplasia type 1	MONDO:0007540	AD	Definitive	Yes	Autosomal dominant	652	30664006	['30664006']
+Lynch syndrome	MLH1	HGNC:7127	Lynch syndrome	MONDO:0005835	AD	Definitive	Yes	Autosomal dominant	144	716318002	['716318002']
+mismatch repair cancer syndrome 1	MLH1	HGNC:7127	mismatch repair cancer syndrome 1	MONDO:0010159	AR	Definitive	Yes	Autosomal recessive		61665008	['61665008']
+Lynch syndrome	MSH2	HGNC:7325	Lynch syndrome	MONDO:0005835	AD	Definitive	Yes	Autosomal dominant	144	716318002	['716318002']
+mismatch repair cancer syndrome 1	MSH2	HGNC:7325	mismatch repair cancer syndrome 1	MONDO:0010159	AR	Definitive	Yes	Autosomal recessive		61665008	['61665008']
+mismatch repair cancer syndrome 1	MSH6	HGNC:7329	mismatch repair cancer syndrome 1	MONDO:0010159	AR	Definitive	Yes	Autosomal recessive		61665008	['61665008']
+Lynch syndrome	MSH6	HGNC:7329	Lynch syndrome	MONDO:0005835	AD	Definitive	Yes	Autosomal dominant	144	716318002	['716318002']
+familial adenomatous polyposis 2	MUTYH	HGNC:7527	familial adenomatous polyposis 2	MONDO:0012041	AR	Definitive	Yes	Autosomal recessive	247798	72900001	
+hypertrophic cardiomyopathy	MYBPC3	HGNC:7551	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+hypertrophic cardiomyopathy	MYH7	HGNC:7577	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	MYH7	HGNC:7577	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+familial thoracic aortic aneurysm and aortic dissection	MYH11	HGNC:7569	familial thoracic aortic aneurysm and aortic dissection	MONDO:0019625	AD	Definitive	Yes	Autosomal dominant	91387	764965000	['45894003', '764965000']
+hypertrophic cardiomyopathy	MYL2	HGNC:7583	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+hypertrophic cardiomyopathy	MYL3	HGNC:7584	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+NF2-related schwannomatosis	NF2	HGNC:7773	NF2-related schwannomatosis	MONDO:0007039	AD	Definitive	Yes	Autosomal dominant	637	92503002	['92503002']
+ornithine carbamoyltransferase deficiency	OTC	HGNC:8512	ornithine carbamoyltransferase deficiency	MONDO:0010703	XL	Definitive	Yes	X-linked recessive	664	80908008	['80908008']
+Fanconi anemia complementation group N	PALB2	HGNC:26144	Fanconi anemia complementation group N	MONDO:0012565	AR	Definitive	Yes	Autosomal recessive		30575002	
+PALB2-related cancer predisposition	PALB2	HGNC:26144	PALB2-related cancer predisposition	MONDO:0700272	AD	Definitive	Yes	Autosomal dominant		unknown	
+hypercholesterolemia, autosomal dominant, 3	PCSK9	HGNC:20001	hypercholesterolemia, autosomal dominant, 3	MONDO:0011369	AD	Definitive	Yes	Autosomal dominant		13644009	
+arrhythmogenic right ventricular cardiomyopathy	PKP2	HGNC:9024	arrhythmogenic right ventricular cardiomyopathy	MONDO:0016587	AD	Definitive	Yes	Autosomal dominant	247	253528005	['281170005']
+arrhythmogenic right ventricular cardiomyopathy	PLN	HGNC:9080	arrhythmogenic right ventricular cardiomyopathy	MONDO:0016587	AD	Moderate	Yes	Autosomal dominant	247	253528005	['281170005']
+intrinsic cardiomyopathy	PLN	HGNC:9080	intrinsic cardiomyopathy	MONDO:0000591	AD	Definitive	Yes	Autosomal dominant		85898001	
+Lynch syndrome	PMS2	HGNC:9122	Lynch syndrome	MONDO:0005835	AD	Definitive	Yes	Autosomal dominant	144	716318002	['716318002']
+mismatch repair cancer syndrome 1	PMS2	HGNC:9122	mismatch repair cancer syndrome 1	MONDO:0010159	AR	Definitive	Yes	Autosomal recessive		61665008	['61665008']
+PRKAG2-related cardiomyopathy	PRKAG2	HGNC:9386	PRKAG2-related cardiomyopathy	MONDO:0800484	AD	Definitive	Yes	Autosomal dominant		85898001	
+PTEN hamartoma tumor syndrome	PTEN	HGNC:9588	PTEN hamartoma tumor syndrome	MONDO:0017623	AD	Definitive	Yes	Autosomal dominant	306498	722859001	['722859001']
+retinoblastoma	RB1	HGNC:9884	retinoblastoma	MONDO:0008380	AD	Definitive	Yes	Autosomal dominant	790	1268901001	['370967009']
+dilated cardiomyopathy	RBM20	HGNC:27424	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+multiple endocrine neoplasia type 2B	RET	HGNC:9967	multiple endocrine neoplasia type 2B	MONDO:0008082	AD	Definitive	Yes	Autosomal dominant	247709	61530001	['61530001']
+multiple endocrine neoplasia type 2A	RET	HGNC:9967	multiple endocrine neoplasia type 2A	MONDO:0008234	AD	Definitive	Yes	Autosomal dominant	247698	721188000	['721188000']
+RPE65-related recessive retinopathy	RPE65	HGNC:10294	RPE65-related recessive retinopathy	MONDO:0100368	AR	Definitive	Yes	Autosomal recessive		28835009	
+malignant hyperthermia, susceptibility to, 1	RYR1	HGNC:10483	malignant hyperthermia, susceptibility to, 1	MONDO:0007783	AD	Definitive	Yes	Autosomal dominant		405501007	
+catecholaminergic polymorphic ventricular tachycardia	RYR2	HGNC:10484	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AD	Definitive	Yes	Autosomal dominant	3286	419671004	['419671004']
+familial long QT syndrome	SCN5A	HGNC:10593	familial long QT syndrome	MONDO:0019171	AD	Definitive	Yes	Autosomal dominant	101016	20852007	['442917000']
+Brugada syndrome	SCN5A	HGNC:10593	Brugada syndrome	MONDO:0015263	AD	Definitive	Yes	Autosomal dominant	130	418818005	['418818005']
+dilated cardiomyopathy	SCN5A	HGNC:10593	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+hereditary pheochromocytoma-paraganglioma	SDHAF2	HGNC:26034	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+hereditary pheochromocytoma-paraganglioma	SDHB	HGNC:10681	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+hereditary pheochromocytoma-paraganglioma	SDHC	HGNC:10682	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+hereditary pheochromocytoma-paraganglioma	SDHD	HGNC:10683	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+aneurysm-osteoarthritis syndrome	SMAD3	HGNC:6769	aneurysm-osteoarthritis syndrome	MONDO:0013426	AD	Definitive	Yes	Autosomal dominant	284984	785808002	
+familial thoracic aortic aneurysm and aortic dissection	SMAD3	HGNC:6769	familial thoracic aortic aneurysm and aortic dissection	MONDO:0019625	AD	Definitive	Yes	Autosomal dominant	91387	764965000	['45894003', '764965000']
+juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome	SMAD4	HGNC:6770	juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome	MONDO:0008278	AD	Definitive	Yes	Autosomal dominant		9273005	
+Peutz-Jeghers syndrome	STK11	HGNC:11389	Peutz-Jeghers syndrome	MONDO:0008280	AD	Definitive	Yes	Autosomal dominant	2869	54411001	['54411001']
+Loeys-Dietz syndrome	TGFBR1	HGNC:11772	Loeys-Dietz syndrome	MONDO:0018954	AD	Definitive	Yes	Autosomal dominant	60030	446263001	['446263001']
+familial thoracic aortic aneurysm and aortic dissection	TGFBR1	HGNC:11772	familial thoracic aortic aneurysm and aortic dissection	MONDO:0019625	AD	Definitive	Yes	Autosomal dominant	91387	764965000	['45894003', '764965000']
+Loeys-Dietz syndrome 2	TGFBR2	HGNC:11773	Loeys-Dietz syndrome 2	MONDO:0012427	AD	Definitive	Yes	Autosomal dominant		446263001	
+familial thoracic aortic aneurysm and aortic dissection	TGFBR2	HGNC:11773	familial thoracic aortic aneurysm and aortic dissection	MONDO:0019625	AD	Definitive	Yes	Autosomal dominant	91387	764965000	['45894003', '764965000']
+arrhythmogenic right ventricular dysplasia 5	TMEM43	HGNC:28472	arrhythmogenic right ventricular dysplasia 5	MONDO:0011459	AD	Definitive	Yes	Autosomal dominant		253528005	
+hereditary pheochromocytoma-paraganglioma	TMEM127	HGNC:26038	hereditary pheochromocytoma-paraganglioma	MONDO:0017366	AD	Definitive	Yes	Autosomal dominant	29072	716857003	
+hypertrophic cardiomyopathy	TNNC1	HGNC:11943	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	TNNC1	HGNC:11943	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+hypertrophic cardiomyopathy	TNNI3	HGNC:11947	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	TNNI3	HGNC:11947	dilated cardiomyopathy	MONDO:0005021	AD	Strong	Yes	Autosomal dominant	217604	195021004	['195021004']
+hypertrophic cardiomyopathy	TNNT2	HGNC:11949	hypertrophic cardiomyopathy	MONDO:0005045	AD	Moderate	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	TNNT2	HGNC:11949	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+Li-Fraumeni syndrome	TP53	HGNC:11998	Li-Fraumeni syndrome	MONDO:0018875	AD	Definitive	Yes	Autosomal dominant	524	428850001	['428850001']
+hypertrophic cardiomyopathy	TPM1	HGNC:12010	hypertrophic cardiomyopathy	MONDO:0005045	AD	Definitive	Yes	Autosomal dominant	217569	233873004	['233873004']
+dilated cardiomyopathy	TPM1	HGNC:12010	dilated cardiomyopathy	MONDO:0005021	AD	Moderate	Yes	Autosomal dominant	217604	195021004	['195021004']
+catecholaminergic polymorphic ventricular tachycardia	TRDN	HGNC:12261	catecholaminergic polymorphic ventricular tachycardia	MONDO:0017990	AR	Definitive	Yes	Autosomal recessive	3286	419671004	['419671004']
+long QT syndrome	TRDN	HGNC:12261	long QT syndrome	MONDO:0002442	AR	Strong	Yes	Autosomal recessive		9651007	
+tuberous sclerosis	TSC1	HGNC:12362	tuberous sclerosis	MONDO:0001734	AD	Definitive	Yes	Autosomal dominant	805	7199000	['7199000']
+tuberous sclerosis	TSC2	HGNC:12363	tuberous sclerosis	MONDO:0001734	AD	Definitive	Yes	Autosomal dominant	805	7199000	['7199000']
+dilated cardiomyopathy	TTN	HGNC:12403	dilated cardiomyopathy	MONDO:0005021	AD	Definitive	Yes	Autosomal dominant	217604	195021004	['195021004']
+hereditary ATTR amyloidosis	TTR	HGNC:12405	hereditary ATTR amyloidosis	MONDO:0017132	AD	Definitive	Yes	Autosomal dominant		17602002	
+von Hippel-Lindau disease	VHL	HGNC:12687	von Hippel-Lindau disease	MONDO:0008667	AD	Definitive	Yes	Autosomal dominant	892	46659004	['46659004']
+Wilms tumor 1	WT1	HGNC:12796	Wilms tumor 1	MONDO:0008679	AD	Definitive	Yes	Autosomal dominant		302849000	

@@ -29,3 +29,6 @@ agents.md
 output/*
 tmp
 tmp/
+
+# MacOS Garbage
+.DS_Store
