@@ -146,6 +146,7 @@ Then inside
 
 
 ## Phenotyping
+- 
 - We have OMIM codes which we can convert to ORPHAcodes.
   - Some of these are 1-1 but most are not
 - Then we have ORPHAcode 1-1 mappings to most SNOMED codes.
@@ -194,4 +195,19 @@ Phenotypic Analysis:
 ## What about familes?
 Are certain prevalence? or prevalence w/o phenotype over represented within families?
 
+Compare to known amounts otherwise noone will believe your novel results.
 
+
+ACMG list from clingen vs from ACMG directly
+
+gnomad vs clinvar variant list
+
+
+
+exome sequencing may have higher coverage over rare variants.
+
+plink file with everything.
+
+survey data to compare individuals who have had a genetic test. 
+- By race
+- by depravation

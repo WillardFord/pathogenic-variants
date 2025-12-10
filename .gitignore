@@ -21,6 +21,9 @@ agents.md
 *.vcf.gz
 *.vcf.gz.tbi
 *.gtf.gz
+*.vcf
+!data/acmg_with_chr.vcf.gz
+!data/acmg_with_chr.vcf.gz.tbi
 
 # Output
 output/*
