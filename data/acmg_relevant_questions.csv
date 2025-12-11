@@ -1,36 +1,4 @@
 gene,disease,question
-TPM1,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TPM1,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TPM1,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TPM1,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-ACTC1,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-ACTC1,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-ACTC1,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-ACTC1,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-DSP,arrhythmogenic cardiomyopathy with wooly hair and keratoderma,Are you still seeing a doctor or health care provider for congestive heart failure?
-DSP,arrhythmogenic cardiomyopathy with wooly hair and keratoderma,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-DSP,arrhythmogenic cardiomyopathy with wooly hair and keratoderma,About how old were you when you were first told you had congestive heart failure?
-DSP,arrhythmogenic cardiomyopathy with wooly hair and keratoderma,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-NF2,NF2-related schwannomatosis,About how old were you when you were first told you had severe hearing loss or partial deafness in one or both ears?
-NF2,NF2-related schwannomatosis,Are you still seeing a doctor or health care provider for severe hearing loss or partial deafness in one or both ears?
-NF2,NF2-related schwannomatosis,Are you currently prescribed medications and/or receiving treatment for severe hearing loss or partial deafness in one or both ears?
-NF2,NF2-related schwannomatosis,"Including yourself, who in your family has had severe hearing loss or partial deafness in one or both ears? Select all that apply."
-OTC,ornithine carbamoyltransferase deficiency,"Are you currently prescribed medications and/or receiving treatment for a liver condition (e.g., cirrhosis)?"
-OTC,ornithine carbamoyltransferase deficiency,"Are you still seeing a doctor or health care provider for a liver condition (e.g., cirrhosis)?"
-OTC,ornithine carbamoyltransferase deficiency,"Including yourself, who in your family has had a liver condition (e.g., cirrhosis)? Select all that apply."
-OTC,ornithine carbamoyltransferase deficiency,"About how old were you when you were first told you had a liver condition (e.g., cirrhosis)?"
-SDHB,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-SDHB,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-SDHB,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-SDHB,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-TTR,hereditary ATTR amyloidosis,"Including yourself, who in your family has had neuropathy? Select all that apply."
-TTR,hereditary ATTR amyloidosis,About how old were you when you were first told you had neuropathy?
-TTR,hereditary ATTR amyloidosis,Are you still seeing a doctor or health care provider for neuropathy?
-TTR,hereditary ATTR amyloidosis,Are you currently prescribed medications and/or receiving treatment for neuropathy?
-SCN5A,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-SCN5A,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-SCN5A,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-SCN5A,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
 BRCA2,BRCA2-related cancer predisposition,About how old were you when you were first told you had breast cancer?
 BRCA2,BRCA2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for ovarian cancer?
 BRCA2,BRCA2-related cancer predisposition,"Including yourself, who in your family has had breast cancer? Select all that apply."
@@ -39,58 +7,94 @@ BRCA2,BRCA2-related cancer predisposition,Are you still seeing a doctor or healt
 BRCA2,BRCA2-related cancer predisposition,About how old were you when you were first told you had ovarian cancer?
 BRCA2,BRCA2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for breast cancer?
 BRCA2,BRCA2-related cancer predisposition,Are you still seeing a doctor or health care provider for breast cancer?
-FLNC,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-FLNC,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-FLNC,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-FLNC,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-PALB2,PALB2-related cancer predisposition,About how old were you when you were first told you had breast cancer?
-PALB2,PALB2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for ovarian cancer?
-PALB2,PALB2-related cancer predisposition,"Including yourself, who in your family has had breast cancer? Select all that apply."
-PALB2,PALB2-related cancer predisposition,"Including yourself, who in your family has had ovarian cancer? Select all that apply."
-PALB2,PALB2-related cancer predisposition,Are you still seeing a doctor or health care provider for ovarian cancer?
-PALB2,PALB2-related cancer predisposition,About how old were you when you were first told you had ovarian cancer?
-PALB2,PALB2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for breast cancer?
-PALB2,PALB2-related cancer predisposition,Are you still seeing a doctor or health care provider for breast cancer?
-TSC1,tuberous sclerosis,"Including yourself, who in your family has had epilepsy or seizure? Select all that apply."
-TSC1,tuberous sclerosis,About how old were you when you were first told you had epilepsy or seizure?
-TSC1,tuberous sclerosis,Are you currently prescribed medications and/or receiving treatment for epilepsy or seizure?
-TSC1,tuberous sclerosis,Are you still seeing a doctor or health care provider for epilepsy or seizure?
-MLH1,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MLH1,Lynch syndrome,About how old were you when you were first told you had colon polyps?
-MLH1,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MLH1,Lynch syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MLH1,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MLH1,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MLH1,Lynch syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-MLH1,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
-MLH1,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-MLH1,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MLH1,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
-MLH1,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-PKP2,arrhythmogenic right ventricular cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-PKP2,arrhythmogenic right ventricular cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-PKP2,arrhythmogenic right ventricular cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-PKP2,arrhythmogenic right ventricular cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-TNNC1,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNC1,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNC1,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNC1,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-MYBPC3,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-MYBPC3,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-MYBPC3,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-MYBPC3,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-DES,arrhythmogenic right ventricular cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-DES,arrhythmogenic right ventricular cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-DES,arrhythmogenic right ventricular cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-DES,arrhythmogenic right ventricular cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-TNNT2,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNT2,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNT2,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNT2,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-BRCA2,Fanconi anemia complementation group D1,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
-BRCA2,Fanconi anemia complementation group D1,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
-BRCA2,Fanconi anemia complementation group D1,About how old were you when you were first told you had blood or soft tissue cancer?
-BRCA2,Fanconi anemia complementation group D1,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
+APOB,"hypercholesterolemia, autosomal dominant, type B","Including yourself, who in your family has had high cholesterol? Select all that apply."
+APOB,"hypercholesterolemia, autosomal dominant, type B",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
+APOB,"hypercholesterolemia, autosomal dominant, type B",About how old were you when you were first told you had high cholesterol?
+APOB,"hypercholesterolemia, autosomal dominant, type B",Are you still seeing a doctor or health care provider for high cholesterol?
+MSH6,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+MSH6,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MSH6,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+MSH6,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
+MSH6,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
+MSH6,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MSH6,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
+MSH6,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+HNF1A,monogenic diabetes,Are you currently prescribed medications and/or receiving treatment for other/unknown diabetes?
+HNF1A,monogenic diabetes,About how old were you when you were first told you had other/unknown diabetes?
+HNF1A,monogenic diabetes,Are you still seeing a doctor or health care provider for other/unknown diabetes?
+HNF1A,monogenic diabetes,"Including yourself, who in your family has had other/unknown diabetes? Select all that apply."
+TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for bone cancer?
+TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
+TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for bone cancer?
+TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had bone cancer?
+TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had bone cancer? Select all that apply."
+TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
+TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had blood or soft tissue cancer?
+TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
+BRCA1,"Fanconi anemia, complementation group S",Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
+BRCA1,"Fanconi anemia, complementation group S",Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
+BRCA1,"Fanconi anemia, complementation group S",About how old were you when you were first told you had blood or soft tissue cancer?
+BRCA1,"Fanconi anemia, complementation group S","Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
+MYH11,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
+MYH11,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+MYH11,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
+MYH11,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+TGFBR1,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
+TGFBR1,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+TGFBR1,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
+TGFBR1,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+PALB2,Fanconi anemia complementation group N,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
+PALB2,Fanconi anemia complementation group N,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
+PALB2,Fanconi anemia complementation group N,About how old were you when you were first told you had blood or soft tissue cancer?
+PALB2,Fanconi anemia complementation group N,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
+PMS2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+PMS2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+PMS2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+PMS2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
+PMS2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
+PMS2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+PMS2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
+PMS2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+TGFBR1,Loeys-Dietz syndrome,About how old were you when you were first told you had aortic aneurysm?
+TGFBR1,Loeys-Dietz syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+TGFBR1,Loeys-Dietz syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
+TGFBR1,Loeys-Dietz syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+MLH1,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+MLH1,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MLH1,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+MLH1,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
+MLH1,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
+MLH1,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MLH1,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
+MLH1,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+BMPR1A,juvenile polyposis syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
+BMPR1A,juvenile polyposis syndrome,About how old were you when you were first told you had colon polyps?
+BMPR1A,juvenile polyposis syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
+BMPR1A,juvenile polyposis syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+BMPR1A,juvenile polyposis syndrome,Are you still seeing a doctor or health care provider for colon polyps?
+BMPR1A,juvenile polyposis syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
+BMPR1A,juvenile polyposis syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+BMPR1A,juvenile polyposis syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+VHL,von Hippel-Lindau disease,Are you still seeing a doctor or health care provider for kidney cancer?
+VHL,von Hippel-Lindau disease,Are you currently prescribed medications and/or receiving treatment for pancreatic cancer?
+VHL,von Hippel-Lindau disease,About how old were you when you were first told you had pancreatic cancer?
+VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had pancreatic cancer? Select all that apply."
+VHL,von Hippel-Lindau disease,About how old were you when you were first told you had kidney cancer?
+VHL,von Hippel-Lindau disease,Are you still seeing a doctor or health care provider for pancreatic cancer?
+VHL,von Hippel-Lindau disease,Are you currently prescribed medications and/or receiving treatment for kidney cancer?
+VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had kidney cancer? Select all that apply."
+COL3A1,"Ehlers-Danlos syndrome, vascular type",About how old were you when you were first told you had aortic aneurysm?
+COL3A1,"Ehlers-Danlos syndrome, vascular type","Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+COL3A1,"Ehlers-Danlos syndrome, vascular type",Are you still seeing a doctor or health care provider for aortic aneurysm?
+COL3A1,"Ehlers-Danlos syndrome, vascular type",Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+SMAD3,aneurysm-osteoarthritis syndrome,About how old were you when you were first told you had aortic aneurysm?
+SMAD3,aneurysm-osteoarthritis syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+SMAD3,aneurysm-osteoarthritis syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
+SMAD3,aneurysm-osteoarthritis syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+FBN1,Marfan syndrome,About how old were you when you were first told you had aortic aneurysm?
+FBN1,Marfan syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+FBN1,Marfan syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
+FBN1,Marfan syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
 BRCA1,BRCA1-related cancer predisposition,About how old were you when you were first told you had breast cancer?
 BRCA1,BRCA1-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for ovarian cancer?
 BRCA1,BRCA1-related cancer predisposition,"Including yourself, who in your family has had breast cancer? Select all that apply."
@@ -99,190 +103,98 @@ BRCA1,BRCA1-related cancer predisposition,Are you still seeing a doctor or healt
 BRCA1,BRCA1-related cancer predisposition,About how old were you when you were first told you had ovarian cancer?
 BRCA1,BRCA1-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for breast cancer?
 BRCA1,BRCA1-related cancer predisposition,Are you still seeing a doctor or health care provider for breast cancer?
-FBN1,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
-FBN1,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-FBN1,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
-FBN1,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-RBM20,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-RBM20,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-RBM20,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-RBM20,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
 RB1,retinoblastoma,"Including yourself, who in your family has had eye cancer? Select all that apply."
 RB1,retinoblastoma,About how old were you when you were first told you had eye cancer?
 RB1,retinoblastoma,Are you still seeing a doctor or health care provider for eye cancer?
 RB1,retinoblastoma,Are you currently prescribed medications and/or receiving treatment for eye cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had colon polyps?
-PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had breast cancer?
-PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had breast cancer? Select all that apply."
-PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
-PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had thyroid cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for breast cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for breast cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for thyroid cancer?
-PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had endometrial cancer?
-PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-RPE65,RPE65-related recessive retinopathy,"Including yourself, who in your family has had blindness, all causes? Select all that apply."
-RPE65,RPE65-related recessive retinopathy,"Are you currently prescribed medications and/or receiving treatment for blindness, all causes?"
-RPE65,RPE65-related recessive retinopathy,"Are you still seeing a doctor or health care provider for blindness, all causes?"
-RPE65,RPE65-related recessive retinopathy,"About how old were you when you were first told you had blindness, all causes?"
-MAX,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-MAX,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-MAX,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-MAX,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-MSH2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MSH2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon polyps?
+MLH1,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+MLH1,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MLH1,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+MLH1,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
+MLH1,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
+MLH1,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MLH1,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
+MLH1,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+RET,multiple endocrine neoplasia type 2B,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
+RET,multiple endocrine neoplasia type 2B,About how old were you when you were first told you had thyroid cancer?
+RET,multiple endocrine neoplasia type 2B,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
+RET,multiple endocrine neoplasia type 2B,Are you still seeing a doctor or health care provider for thyroid cancer?
+MUTYH,familial adenomatous polyposis 2,Are you currently prescribed medications and/or receiving treatment for colon polyps?
+MUTYH,familial adenomatous polyposis 2,About how old were you when you were first told you had colon polyps?
+MUTYH,familial adenomatous polyposis 2,"Including yourself, who in your family has had colon polyps? Select all that apply."
+MUTYH,familial adenomatous polyposis 2,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MUTYH,familial adenomatous polyposis 2,Are you still seeing a doctor or health care provider for colon polyps?
+MUTYH,familial adenomatous polyposis 2,About how old were you when you were first told you had colon cancer/rectal cancer?
+MUTYH,familial adenomatous polyposis 2,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MUTYH,familial adenomatous polyposis 2,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+CACNA1S,"malignant hyperthermia, susceptibility to, 5","Including yourself, who in your family has had reactions to anesthesia (such as hyperthermia)? Select all that apply."
+CACNA1S,"malignant hyperthermia, susceptibility to, 5",About how old were you when you were first told you had reactions to anesthesia (such as hyperthermia)?
+CACNA1S,"malignant hyperthermia, susceptibility to, 5",Are you currently prescribed medications and/or receiving treatment for reactions to anesthesia (such as hyperthermia)?
+CACNA1S,"malignant hyperthermia, susceptibility to, 5",Are you still seeing a doctor or health care provider for reactions to anesthesia (such as hyperthermia)?
+PALB2,PALB2-related cancer predisposition,About how old were you when you were first told you had breast cancer?
+PALB2,PALB2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for ovarian cancer?
+PALB2,PALB2-related cancer predisposition,"Including yourself, who in your family has had breast cancer? Select all that apply."
+PALB2,PALB2-related cancer predisposition,"Including yourself, who in your family has had ovarian cancer? Select all that apply."
+PALB2,PALB2-related cancer predisposition,Are you still seeing a doctor or health care provider for ovarian cancer?
+PALB2,PALB2-related cancer predisposition,About how old were you when you were first told you had ovarian cancer?
+PALB2,PALB2-related cancer predisposition,Are you currently prescribed medications and/or receiving treatment for breast cancer?
+PALB2,PALB2-related cancer predisposition,Are you still seeing a doctor or health care provider for breast cancer?
+PMS2,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+PMS2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+PMS2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+PMS2,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
+PMS2,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
+PMS2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+PMS2,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
+PMS2,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+APC,classic or attenuated familial adenomatous polyposis,Are you currently prescribed medications and/or receiving treatment for colon polyps?
+APC,classic or attenuated familial adenomatous polyposis,About how old were you when you were first told you had colon polyps?
+APC,classic or attenuated familial adenomatous polyposis,"Including yourself, who in your family has had colon polyps? Select all that apply."
+APC,classic or attenuated familial adenomatous polyposis,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+APC,classic or attenuated familial adenomatous polyposis,Are you still seeing a doctor or health care provider for colon polyps?
+APC,classic or attenuated familial adenomatous polyposis,About how old were you when you were first told you had colon cancer/rectal cancer?
+APC,classic or attenuated familial adenomatous polyposis,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+APC,classic or attenuated familial adenomatous polyposis,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+LDLR,"hypercholesterolemia, familial, 1","Including yourself, who in your family has had high cholesterol? Select all that apply."
+LDLR,"hypercholesterolemia, familial, 1",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
+LDLR,"hypercholesterolemia, familial, 1",About how old were you when you were first told you had high cholesterol?
+LDLR,"hypercholesterolemia, familial, 1",Are you still seeing a doctor or health care provider for high cholesterol?
+BRCA2,Fanconi anemia complementation group D1,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
+BRCA2,Fanconi anemia complementation group D1,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
+BRCA2,Fanconi anemia complementation group D1,About how old were you when you were first told you had blood or soft tissue cancer?
+BRCA2,Fanconi anemia complementation group D1,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
 MSH2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MSH2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon polyps? Select all that apply."
 MSH2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
 MSH2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MSH2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon polyps?
 MSH2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
 MSH2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
 MSH2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
 MSH2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
 MSH2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-KCNQ1,Jervell and Lange-Nielsen syndrome,About how old were you when you were first told you had severe hearing loss or partial deafness in one or both ears?
-KCNQ1,Jervell and Lange-Nielsen syndrome,Are you still seeing a doctor or health care provider for severe hearing loss or partial deafness in one or both ears?
-KCNQ1,Jervell and Lange-Nielsen syndrome,Are you currently prescribed medications and/or receiving treatment for severe hearing loss or partial deafness in one or both ears?
-KCNQ1,Jervell and Lange-Nielsen syndrome,"Including yourself, who in your family has had severe hearing loss or partial deafness in one or both ears? Select all that apply."
-TPM1,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TPM1,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TPM1,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TPM1,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-PCSK9,"hypercholesterolemia, autosomal dominant, 3","Including yourself, who in your family has had high cholesterol? Select all that apply."
-PCSK9,"hypercholesterolemia, autosomal dominant, 3",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
-PCSK9,"hypercholesterolemia, autosomal dominant, 3",About how old were you when you were first told you had high cholesterol?
-PCSK9,"hypercholesterolemia, autosomal dominant, 3",Are you still seeing a doctor or health care provider for high cholesterol?
-SMAD3,aneurysm-osteoarthritis syndrome,About how old were you when you were first told you had aortic aneurysm?
-SMAD3,aneurysm-osteoarthritis syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-SMAD3,aneurysm-osteoarthritis syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
-SMAD3,aneurysm-osteoarthritis syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-SDHD,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-SDHD,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-SDHD,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-SDHD,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-HNF1A,monogenic diabetes,About how old were you when you were first told you had prediabetes?
-HNF1A,monogenic diabetes,Are you currently prescribed medications and/or receiving treatment for other/unknown diabetes?
-HNF1A,monogenic diabetes,Are you still seeing a doctor or health care provider for type 2 diabetes?
-HNF1A,monogenic diabetes,About how old were you when you were first told you had type 2 diabetes?
-HNF1A,monogenic diabetes,About how old were you when you were first told you had other/unknown diabetes?
-HNF1A,monogenic diabetes,Are you still seeing a doctor or health care provider for type 1 diabetes?
-HNF1A,monogenic diabetes,Are you still seeing a doctor or health care provider for prediabetes?
-HNF1A,monogenic diabetes,"Including yourself, who in your family has had prediabetes? Select all that apply."
-HNF1A,monogenic diabetes,Are you still seeing a doctor or health care provider for other/unknown diabetes?
-HNF1A,monogenic diabetes,About how old were you when you were first told you had type 1 diabetes?
-HNF1A,monogenic diabetes,"Including yourself, who in your family has had type 1 diabetes? Select all that apply."
-HNF1A,monogenic diabetes,"Including yourself, who in your family has had other/unknown diabetes? Select all that apply."
-HNF1A,monogenic diabetes,Are you currently prescribed medications and/or receiving treatment for prediabetes?
-HNF1A,monogenic diabetes,Are you currently prescribed medications and/or receiving treatment for type 2 diabetes?
-HNF1A,monogenic diabetes,Are you currently prescribed medications and/or receiving treatment for type 1 diabetes?
-HNF1A,monogenic diabetes,"Including yourself, who in your family has had type 2 diabetes? Select all that apply."
-LMNA,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-LMNA,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-LMNA,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-LMNA,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-DSG2,arrhythmogenic right ventricular cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-DSG2,arrhythmogenic right ventricular cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-DSG2,arrhythmogenic right ventricular cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-DSG2,arrhythmogenic right ventricular cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-SDHC,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-SDHC,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-SDHC,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-SDHC,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-PALB2,Fanconi anemia complementation group N,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
-PALB2,Fanconi anemia complementation group N,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
-PALB2,Fanconi anemia complementation group N,About how old were you when you were first told you had blood or soft tissue cancer?
-PALB2,Fanconi anemia complementation group N,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
-ABCD1,adrenoleukodystrophy,"Including yourself, who in your family has had neuropathy? Select all that apply."
-ABCD1,adrenoleukodystrophy,About how old were you when you were first told you had neuropathy?
-ABCD1,adrenoleukodystrophy,Are you still seeing a doctor or health care provider for neuropathy?
-ABCD1,adrenoleukodystrophy,Are you currently prescribed medications and/or receiving treatment for neuropathy?
-SDHAF2,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-SDHAF2,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-SDHAF2,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-SDHAF2,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-TMEM127,hereditary pheochromocytoma-paraganglioma,About how old were you when you were first told you had endocrine cancer?
-TMEM127,hereditary pheochromocytoma-paraganglioma,Are you still seeing a doctor or health care provider for endocrine cancer?
-TMEM127,hereditary pheochromocytoma-paraganglioma,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-TMEM127,hereditary pheochromocytoma-paraganglioma,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2B,About how old were you when you were first told you had endocrine cancer?
-RET,multiple endocrine neoplasia type 2B,Are you still seeing a doctor or health care provider for endocrine cancer?
-RET,multiple endocrine neoplasia type 2B,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-RET,multiple endocrine neoplasia type 2B,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2B,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2B,About how old were you when you were first told you had thyroid cancer?
-RET,multiple endocrine neoplasia type 2B,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
-RET,multiple endocrine neoplasia type 2B,Are you still seeing a doctor or health care provider for thyroid cancer?
-MYH7,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-MYH7,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-MYH7,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-MYH7,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-TNNI3,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNI3,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNI3,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNI3,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
+TGFBR2,Loeys-Dietz syndrome 2,About how old were you when you were first told you had aortic aneurysm?
+TGFBR2,Loeys-Dietz syndrome 2,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+TGFBR2,Loeys-Dietz syndrome 2,Are you still seeing a doctor or health care provider for aortic aneurysm?
+TGFBR2,Loeys-Dietz syndrome 2,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
+MSH6,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+MSH6,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MSH6,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+MSH6,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
+MSH6,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
+MSH6,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MSH6,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
+MSH6,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
 SMAD3,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
 SMAD3,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
 SMAD3,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
 SMAD3,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-TGFBR1,Loeys-Dietz syndrome,About how old were you when you were first told you had aortic aneurysm?
-TGFBR1,Loeys-Dietz syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-TGFBR1,Loeys-Dietz syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
-TGFBR1,Loeys-Dietz syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-PMS2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-PMS2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon polyps?
-PMS2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-PMS2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon polyps? Select all that apply."
-PMS2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-PMS2,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-PMS2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon polyps?
-PMS2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
-PMS2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
-PMS2,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-PMS2,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
-PMS2,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2A,About how old were you when you were first told you had endocrine cancer?
-RET,multiple endocrine neoplasia type 2A,Are you still seeing a doctor or health care provider for endocrine cancer?
-RET,multiple endocrine neoplasia type 2A,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-RET,multiple endocrine neoplasia type 2A,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2A,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
-RET,multiple endocrine neoplasia type 2A,About how old were you when you were first told you had thyroid cancer?
-RET,multiple endocrine neoplasia type 2A,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
-RET,multiple endocrine neoplasia type 2A,Are you still seeing a doctor or health care provider for thyroid cancer?
-TNNT2,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNT2,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNT2,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNT2,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-PLN,intrinsic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-PLN,intrinsic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-PLN,intrinsic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-PLN,intrinsic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
 RYR1,"malignant hyperthermia, susceptibility to, 1","Including yourself, who in your family has had reactions to anesthesia (such as hyperthermia)? Select all that apply."
 RYR1,"malignant hyperthermia, susceptibility to, 1",About how old were you when you were first told you had reactions to anesthesia (such as hyperthermia)?
 RYR1,"malignant hyperthermia, susceptibility to, 1",Are you currently prescribed medications and/or receiving treatment for reactions to anesthesia (such as hyperthermia)?
 RYR1,"malignant hyperthermia, susceptibility to, 1",Are you still seeing a doctor or health care provider for reactions to anesthesia (such as hyperthermia)?
-DES,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-DES,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-DES,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-DES,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-BRCA1,"Fanconi anemia, complementation group S",Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
-BRCA1,"Fanconi anemia, complementation group S",Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
-BRCA1,"Fanconi anemia, complementation group S",About how old were you when you were first told you had blood or soft tissue cancer?
-BRCA1,"Fanconi anemia, complementation group S","Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
-WT1,Wilms tumor 1,Are you still seeing a doctor or health care provider for kidney cancer?
-WT1,Wilms tumor 1,About how old were you when you were first told you had kidney cancer?
-WT1,Wilms tumor 1,Are you currently prescribed medications and/or receiving treatment for kidney cancer?
-WT1,Wilms tumor 1,"Including yourself, who in your family has had kidney cancer? Select all that apply."
+TGFBR2,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
+TGFBR2,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+TGFBR2,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
+TGFBR2,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
 STK11,Peutz-Jeghers syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
 STK11,Peutz-Jeghers syndrome,About how old were you when you were first told you had colon polyps?
 STK11,Peutz-Jeghers syndrome,Are you currently prescribed medications and/or receiving treatment for stomach cancer?
@@ -299,50 +211,18 @@ STK11,Peutz-Jeghers syndrome,About how old were you when you were first told you
 STK11,Peutz-Jeghers syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
 STK11,Peutz-Jeghers syndrome,Are you still seeing a doctor or health care provider for stomach cancer?
 STK11,Peutz-Jeghers syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-TNNI3,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNI3,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNI3,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNI3,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-FLNC,myofibrillar myopathy,Are you currently prescribed medications and/or receiving treatment for muscular dystrophy (MD)?
-FLNC,myofibrillar myopathy,Are you still seeing a doctor or health care provider for muscular dystrophy (MD)?
-FLNC,myofibrillar myopathy,About how old were you when you were first told you had muscular dystrophy (MD)?
-FLNC,myofibrillar myopathy,"Including yourself, who in your family has had muscular dystrophy (MD)? Select all that apply."
-PLN,arrhythmogenic right ventricular cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-PLN,arrhythmogenic right ventricular cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-PLN,arrhythmogenic right ventricular cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-PLN,arrhythmogenic right ventricular cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-PMS2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-PMS2,Lynch syndrome,About how old were you when you were first told you had colon polyps?
-PMS2,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-PMS2,Lynch syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-PMS2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-PMS2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-PMS2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-PMS2,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
-PMS2,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-PMS2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-PMS2,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
-PMS2,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-TNNC1,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TNNC1,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TNNC1,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TNNC1,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-TGFBR1,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
-TGFBR1,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-TGFBR1,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
-TGFBR1,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-TSC2,tuberous sclerosis,"Including yourself, who in your family has had epilepsy or seizure? Select all that apply."
-TSC2,tuberous sclerosis,About how old were you when you were first told you had epilepsy or seizure?
-TSC2,tuberous sclerosis,Are you currently prescribed medications and/or receiving treatment for epilepsy or seizure?
-TSC2,tuberous sclerosis,Are you still seeing a doctor or health care provider for epilepsy or seizure?
-APC,classic or attenuated familial adenomatous polyposis,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-APC,classic or attenuated familial adenomatous polyposis,About how old were you when you were first told you had colon polyps?
-APC,classic or attenuated familial adenomatous polyposis,"Including yourself, who in your family has had colon polyps? Select all that apply."
-APC,classic or attenuated familial adenomatous polyposis,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-APC,classic or attenuated familial adenomatous polyposis,Are you still seeing a doctor or health care provider for colon polyps?
-APC,classic or attenuated familial adenomatous polyposis,About how old were you when you were first told you had colon cancer/rectal cancer?
-APC,classic or attenuated familial adenomatous polyposis,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-APC,classic or attenuated familial adenomatous polyposis,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
+PCSK9,"hypercholesterolemia, autosomal dominant, 3","Including yourself, who in your family has had high cholesterol? Select all that apply."
+PCSK9,"hypercholesterolemia, autosomal dominant, 3",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
+PCSK9,"hypercholesterolemia, autosomal dominant, 3",About how old were you when you were first told you had high cholesterol?
+PCSK9,"hypercholesterolemia, autosomal dominant, 3",Are you still seeing a doctor or health care provider for high cholesterol?
+MSH2,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+MSH2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
+MSH2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+MSH2,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
+MSH2,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
+MSH2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
+MSH2,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
+MSH2,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,About how old were you when you were first told you had colon polyps?
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
@@ -351,183 +231,27 @@ SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,Are you 
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
 SMAD4,juvenile polyposis/hereditary hemorrhagic telangiectasia syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-BAG3,myofibrillar myopathy,Are you currently prescribed medications and/or receiving treatment for muscular dystrophy (MD)?
-BAG3,myofibrillar myopathy,Are you still seeing a doctor or health care provider for muscular dystrophy (MD)?
-BAG3,myofibrillar myopathy,About how old were you when you were first told you had muscular dystrophy (MD)?
-BAG3,myofibrillar myopathy,"Including yourself, who in your family has had muscular dystrophy (MD)? Select all that apply."
-TGFBR2,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
-TGFBR2,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-TGFBR2,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
-TGFBR2,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-MYH11,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
-MYH11,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-MYH11,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
-MYH11,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-GLA,Fabry disease,"Including yourself, who in your family has had neuropathy? Select all that apply."
-GLA,Fabry disease,About how old were you when you were first told you had neuropathy?
-GLA,Fabry disease,Are you still seeing a doctor or health care provider for neuropathy?
-GLA,Fabry disease,Are you currently prescribed medications and/or receiving treatment for neuropathy?
-APOB,"hypercholesterolemia, autosomal dominant, type B","Including yourself, who in your family has had high cholesterol? Select all that apply."
-APOB,"hypercholesterolemia, autosomal dominant, type B",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
-APOB,"hypercholesterolemia, autosomal dominant, type B",About how old were you when you were first told you had high cholesterol?
-APOB,"hypercholesterolemia, autosomal dominant, type B",Are you still seeing a doctor or health care provider for high cholesterol?
-MSH6,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MSH6,Lynch syndrome,About how old were you when you were first told you had colon polyps?
-MSH6,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MSH6,Lynch syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MSH6,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MSH6,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MSH6,Lynch syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-MSH6,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
-MSH6,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-MSH6,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MSH6,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
-MSH6,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-MYL2,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-MYL2,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-MYL2,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-MYL2,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-BMPR1A,juvenile polyposis syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-BMPR1A,juvenile polyposis syndrome,About how old were you when you were first told you had colon polyps?
-BMPR1A,juvenile polyposis syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-BMPR1A,juvenile polyposis syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-BMPR1A,juvenile polyposis syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-BMPR1A,juvenile polyposis syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-BMPR1A,juvenile polyposis syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-BMPR1A,juvenile polyposis syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-TGFBR2,Loeys-Dietz syndrome 2,About how old were you when you were first told you had aortic aneurysm?
-TGFBR2,Loeys-Dietz syndrome 2,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-TGFBR2,Loeys-Dietz syndrome 2,Are you still seeing a doctor or health care provider for aortic aneurysm?
-TGFBR2,Loeys-Dietz syndrome 2,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-MSH2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MSH2,Lynch syndrome,About how old were you when you were first told you had colon polyps?
-MSH2,Lynch syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MSH2,Lynch syndrome,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MSH2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MSH2,Lynch syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MSH2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon polyps?
-MSH2,Lynch syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
-MSH2,Lynch syndrome,About how old were you when you were first told you had colon cancer/rectal cancer?
-MSH2,Lynch syndrome,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MSH2,Lynch syndrome,About how old were you when you were first told you had endometrial cancer?
-MSH2,Lynch syndrome,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-ATP7B,Wilson disease,"Are you currently prescribed medications and/or receiving treatment for a liver condition (e.g., cirrhosis)?"
-ATP7B,Wilson disease,"Are you still seeing a doctor or health care provider for a liver condition (e.g., cirrhosis)?"
-ATP7B,Wilson disease,"Including yourself, who in your family has had a liver condition (e.g., cirrhosis)? Select all that apply."
-ATP7B,Wilson disease,"About how old were you when you were first told you had a liver condition (e.g., cirrhosis)?"
-FBN1,Marfan syndrome,About how old were you when you were first told you had aortic aneurysm?
-FBN1,Marfan syndrome,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-FBN1,Marfan syndrome,Are you still seeing a doctor or health care provider for aortic aneurysm?
-FBN1,Marfan syndrome,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for bone cancer?
-TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for blood or soft tissue cancer?
-TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for bone cancer?
-TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had breast cancer?
-TP53,Li-Fraumeni syndrome,"About how old were you when you were first told you had head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-TP53,Li-Fraumeni syndrome,"Are you currently prescribed medications and/or receiving treatment for head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had bone cancer?
-TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had brain cancer? Select all that apply."
-TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had breast cancer? Select all that apply."
-TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had bone cancer? Select all that apply."
-TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for brain cancer?
-TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had brain cancer?
-TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for blood or soft tissue cancer?
-TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for brain cancer?
-TP53,Li-Fraumeni syndrome,Are you currently prescribed medications and/or receiving treatment for breast cancer?
-TP53,Li-Fraumeni syndrome,Are you still seeing a doctor or health care provider for breast cancer?
-TP53,Li-Fraumeni syndrome,"Are you still seeing a doctor or health care provider for head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-TP53,Li-Fraumeni syndrome,About how old were you when you were first told you had blood or soft tissue cancer?
-TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.) Select all that apply."
-TP53,Li-Fraumeni syndrome,"Including yourself, who in your family has had blood or soft tissue cancer? Select all that apply."
-CACNA1S,"malignant hyperthermia, susceptibility to, 5","Including yourself, who in your family has had reactions to anesthesia (such as hyperthermia)? Select all that apply."
-CACNA1S,"malignant hyperthermia, susceptibility to, 5",About how old were you when you were first told you had reactions to anesthesia (such as hyperthermia)?
-CACNA1S,"malignant hyperthermia, susceptibility to, 5",Are you currently prescribed medications and/or receiving treatment for reactions to anesthesia (such as hyperthermia)?
-CACNA1S,"malignant hyperthermia, susceptibility to, 5",Are you still seeing a doctor or health care provider for reactions to anesthesia (such as hyperthermia)?
-MUTYH,familial adenomatous polyposis 2,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MUTYH,familial adenomatous polyposis 2,About how old were you when you were first told you had colon polyps?
-MUTYH,familial adenomatous polyposis 2,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MUTYH,familial adenomatous polyposis 2,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MUTYH,familial adenomatous polyposis 2,Are you still seeing a doctor or health care provider for colon polyps?
-MUTYH,familial adenomatous polyposis 2,About how old were you when you were first told you had colon cancer/rectal cancer?
-MUTYH,familial adenomatous polyposis 2,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MUTYH,familial adenomatous polyposis 2,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-CYP27A1,cerebrotendinous xanthomatosis,"Including yourself, who in your family has had neuropathy? Select all that apply."
-CYP27A1,cerebrotendinous xanthomatosis,About how old were you when you were first told you had neuropathy?
-CYP27A1,cerebrotendinous xanthomatosis,Are you still seeing a doctor or health care provider for neuropathy?
-CYP27A1,cerebrotendinous xanthomatosis,Are you currently prescribed medications and/or receiving treatment for neuropathy?
-LDLR,"hypercholesterolemia, familial, 1","Including yourself, who in your family has had high cholesterol? Select all that apply."
-LDLR,"hypercholesterolemia, familial, 1",Are you currently prescribed medications and/or receiving treatment for high cholesterol?
-LDLR,"hypercholesterolemia, familial, 1",About how old were you when you were first told you had high cholesterol?
-LDLR,"hypercholesterolemia, familial, 1",Are you still seeing a doctor or health care provider for high cholesterol?
-MYL3,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-MYL3,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-MYL3,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-MYL3,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-TTN,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-TTN,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-TTN,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-TTN,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-MLH1,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MLH1,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon polyps?
-MLH1,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MLH1,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MLH1,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MLH1,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MLH1,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon polyps?
-MLH1,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
-MLH1,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
-MLH1,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MLH1,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
-MLH1,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-VHL,von Hippel-Lindau disease,"About how old were you when you were first told you had head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-VHL,von Hippel-Lindau disease,"Are you currently prescribed medications and/or receiving treatment for head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had brain cancer? Select all that apply."
-VHL,von Hippel-Lindau disease,Are you still seeing a doctor or health care provider for brain cancer?
-VHL,von Hippel-Lindau disease,Are you still seeing a doctor or health care provider for kidney cancer?
-VHL,von Hippel-Lindau disease,About how old were you when you were first told you had brain cancer?
-VHL,von Hippel-Lindau disease,Are you currently prescribed medications and/or receiving treatment for pancreatic cancer?
-VHL,von Hippel-Lindau disease,About how old were you when you were first told you had pancreatic cancer?
-VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had pancreatic cancer? Select all that apply."
-VHL,von Hippel-Lindau disease,About how old were you when you were first told you had kidney cancer?
-VHL,von Hippel-Lindau disease,Are you currently prescribed medications and/or receiving treatment for brain cancer?
-VHL,von Hippel-Lindau disease,Are you still seeing a doctor or health care provider for pancreatic cancer?
-VHL,von Hippel-Lindau disease,"Are you still seeing a doctor or health care provider for head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.)"
-VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had head and neck cancer? (This includes cancers of the mouth, sinuses, nose, or throat. This does not include brain cancer.) Select all that apply."
-VHL,von Hippel-Lindau disease,Are you currently prescribed medications and/or receiving treatment for kidney cancer?
-VHL,von Hippel-Lindau disease,"Including yourself, who in your family has had kidney cancer? Select all that apply."
-PRKAG2,PRKAG2-related cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-PRKAG2,PRKAG2-related cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-PRKAG2,PRKAG2-related cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-PRKAG2,PRKAG2-related cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-BAG3,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-BAG3,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-BAG3,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-BAG3,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-MYH7,dilated cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-MYH7,dilated cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-MYH7,dilated cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-MYH7,dilated cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-MSH6,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon polyps?
-MSH6,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon polyps?
-MSH6,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
-MSH6,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon polyps? Select all that apply."
-MSH6,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for colon cancer/rectal cancer?
-MSH6,mismatch repair cancer syndrome 1,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
-MSH6,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon polyps?
-MSH6,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for endometrial cancer?
-MSH6,mismatch repair cancer syndrome 1,About how old were you when you were first told you had colon cancer/rectal cancer?
-MSH6,mismatch repair cancer syndrome 1,Are you still seeing a doctor or health care provider for colon cancer/rectal cancer?
-MSH6,mismatch repair cancer syndrome 1,About how old were you when you were first told you had endometrial cancer?
-MSH6,mismatch repair cancer syndrome 1,"Including yourself, who in your family has had colon cancer/rectal cancer? Select all that apply."
-COL3A1,"Ehlers-Danlos syndrome, vascular type",About how old were you when you were first told you had aortic aneurysm?
-COL3A1,"Ehlers-Danlos syndrome, vascular type","Including yourself, who in your family has had aortic aneurysm? Select all that apply."
-COL3A1,"Ehlers-Danlos syndrome, vascular type",Are you still seeing a doctor or health care provider for aortic aneurysm?
-COL3A1,"Ehlers-Danlos syndrome, vascular type",Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
-ACTC1,hypertrophic cardiomyopathy,Are you still seeing a doctor or health care provider for congestive heart failure?
-ACTC1,hypertrophic cardiomyopathy,Are you currently prescribed medications and/or receiving treatment for congestive heart failure?
-ACTC1,hypertrophic cardiomyopathy,About how old were you when you were first told you had congestive heart failure?
-ACTC1,hypertrophic cardiomyopathy,"Including yourself, who in your family has had congestive heart failure? Select all that apply."
-MEN1,multiple endocrine neoplasia type 1,About how old were you when you were first told you had endocrine cancer?
-MEN1,multiple endocrine neoplasia type 1,Are you still seeing a doctor or health care provider for endocrine cancer?
-MEN1,multiple endocrine neoplasia type 1,Are you currently prescribed medications and/or receiving treatment for endocrine cancer?
-MEN1,multiple endocrine neoplasia type 1,"Including yourself, who in your family has had endocrine cancer? Select all that apply."
+PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had breast cancer?
+PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had endometrial cancer? Select all that apply."
+PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had breast cancer? Select all that apply."
+PTEN,PTEN hamartoma tumor syndrome,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
+PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had thyroid cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for endometrial cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for breast cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for breast cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for endometrial cancer?
+PTEN,PTEN hamartoma tumor syndrome,Are you still seeing a doctor or health care provider for thyroid cancer?
+PTEN,PTEN hamartoma tumor syndrome,About how old were you when you were first told you had endometrial cancer?
+RET,multiple endocrine neoplasia type 2A,"Including yourself, who in your family has had thyroid cancer? Select all that apply."
+RET,multiple endocrine neoplasia type 2A,About how old were you when you were first told you had thyroid cancer?
+RET,multiple endocrine neoplasia type 2A,Are you currently prescribed medications and/or receiving treatment for thyroid cancer?
+RET,multiple endocrine neoplasia type 2A,Are you still seeing a doctor or health care provider for thyroid cancer?
+WT1,Wilms tumor 1,Are you still seeing a doctor or health care provider for kidney cancer?
+WT1,Wilms tumor 1,About how old were you when you were first told you had kidney cancer?
+WT1,Wilms tumor 1,Are you currently prescribed medications and/or receiving treatment for kidney cancer?
+WT1,Wilms tumor 1,"Including yourself, who in your family has had kidney cancer? Select all that apply."
+FBN1,familial thoracic aortic aneurysm and aortic dissection,About how old were you when you were first told you had aortic aneurysm?
+FBN1,familial thoracic aortic aneurysm and aortic dissection,"Including yourself, who in your family has had aortic aneurysm? Select all that apply."
+FBN1,familial thoracic aortic aneurysm and aortic dissection,Are you still seeing a doctor or health care provider for aortic aneurysm?
+FBN1,familial thoracic aortic aneurysm and aortic dissection,Are you currently prescribed medications and/or receiving treatment for aortic aneurysm?
